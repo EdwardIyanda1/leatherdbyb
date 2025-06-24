@@ -71,9 +71,16 @@ MESSAGE_TAGS = {
 }
 
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
 
 SECRET_KEY = 'r(3g4)f$502+nojhb=xed_*yk^4-^7ktruoil)^2p^$+wa9vx8'
 # Session settings
 SESSION_COOKIE_AGE = 86400  # 1 day in seconds
 SESSION_SAVE_EVERY_REQUEST = True
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
