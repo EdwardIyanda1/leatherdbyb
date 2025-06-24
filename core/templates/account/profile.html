@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div id="profile" class="page">
+    <div class="profile-container">
+        <div class="profile-sidebar">
+            <div class="user-info">
+                <div class="user-avatar-large">
+                    {% if user.userprofile.profile_image %}
+                    <img src="{{ user.userprofile.profile_image.url }}" alt="{{ user.username }}">
+                    {% else %}
+                    <i class="fas fa-user"></i>
+                    {% endif %}
+                </div>
+                <h3 class="user-name">{{ user.get_full_name|default:user.username }}</h3>
+                <p class="user-email">{{ user.email }}</p>
+            </div>
+            
+            <ul class="profile-nav">
+                <li class="profile-nav-item">
+                    <a class="profile-nav-link active" href="{% url 'account_dashboard' %}">
+                        <i class="fas fa-user-circle"></i> Account
+                    </a>
+                </li>
+                <li class="profile-nav-item">
+                    <a class="profile-nav-link" href="{% url 'address_list' %}">
+                        <i class="fas fa-map-marker-alt"></i> Addresses
+                    </a>
+                </li>
+                <li class="profile-nav-item">
+                    <a class="profile-nav-link" href="{% url 'wishlist' %}">
+                        <i class="fas fa-heart"></i> Wishlist
+                    </a>
+                </li>
+                <li class="profile-nav-item">
+                    <a class="profile-nav-link" href="{% url 'account_dashboard' %}">
+                        <i class="fas fa-cog"></i> Settings
+                    </a>
+                </li>
+                <li class="profile-nav-item">
+                    <a class="profile-nav-link" href="{% url 'logout' %}">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="profile-content">
+            <h2 class="mb-30">Account Information</h2>
+            
+            <form method="post" action="{% url 'account_dashboard' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" name="full_name" 
+                           value="{{ user.get_full_name }}" placeholder="Enter your full name">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-input" name="email" 
+                           value="{{ user.email }}" placeholder="Enter your email" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" class="form-input" name="phone" 
+                           value="{{ user.userprofile.phone }}" placeholder="Enter your phone number">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Date of Birth</label>
+                    <input type="date" class="form-input" name="date_of_birth" 
+                           value="{{ user.userprofile.date_of_birth|date:'Y-m-d' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Gender</label>
+                    <select class="form-input" name="gender">
+                        <option value="">Select gender</option>
+                        <option value="male" {% if user.userprofile.gender == 'male' %}selected{% endif %}>Male</option>
+                        <option value="female" {% if user.userprofile.gender == 'female' %}selected{% endif %}>Female</option>
+                        <option value="other" {% if user.userprofile.gender == 'other' %}selected{% endif %}>Other</option>
+                        <option value="prefer_not_to_say" {% if user.userprofile.gender == 'prefer_not_to_say' %}selected{% endif %}>Prefer not to say</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Profile Image</label>
+                    <input type="file" class="form-input" name="profile_image">
+                </div>
+                
+                <button type="submit" class="save-btn">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

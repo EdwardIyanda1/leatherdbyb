@@ -1,0 +1,53 @@
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-col">
+            <div class="footer-logo">LeatherdbyB</div>
+            <p class="footer-about">
+                Premium leather goods handcrafted with care and precision. 
+                We create timeless pieces that combine functionality with elegance.
+            </p>
+            <div class="footer-social">
+                <a href="#" class="footer-social-link"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="footer-social-link"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="footer-social-link"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="footer-social-link"><i class="fab fa-pinterest"></i></a>
+            </div>
+        </div>
+        
+        <div class="footer-col">
+            <h3 class="footer-title">Shop</h3>
+            <ul class="footer-links">
+                <li class="footer-link-item"><a href="{% url 'product_list' %}" class="footer-link">All Products</a></li>
+                <li class="footer-link-item"><a href="{% url 'product_list' %}?sort=newest" class="footer-link">New Arrivals</a></li>
+                <li class="footer-link-item"><a href="{% url 'product_list' %}?sort=popular" class="footer-link">Best Sellers</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-col">
+            <h3 class="footer-title">Information</h3>
+            <ul class="footer-links">
+                <li class="footer-link-item"><a href="{% url 'about' %}" class="footer-link">About Us</a></li>
+                <li class="footer-link-item"><a href="#" class="footer-link">Our Craft</a></li>
+                <li class="footer-link-item"><a href="#" class="footer-link">Care Guide</a></li>
+                <li class="footer-link-item"><a href="#" class="footer-link">Shipping & Returns</a></li>
+                <li class="footer-link-item"><a href="#" class="footer-link">Privacy Policy</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-col">
+            <h3 class="footer-title">Newsletter</h3>
+            <p style="opacity: 0.8; margin-bottom: 20px; line-height: 1.6;">
+                Subscribe to our newsletter for exclusive offers, new arrivals, and leather care tips.
+            </p>
+            {% comment %} <form method="post" action="{% url 'newsletter_subscribe' %}">
+                {% csrf_token %}
+                <input type="email" class="newsletter-input" placeholder="Your email address" name="email" required>
+                <button type="submit" class="newsletter-btn">Subscribe</button>
+            </form> {% endcomment %}
+        </div>
+    </div>
+    
+    <div class="footer-bottom">
+        &copy; {% now "Y" %} LeatherdbyB. All rights reserved.
+    </div>
+</footer>

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div id="profile" class="page">
+    <div class="profile-container">
+        <div class="profile-sidebar">
+            <!-- Same sidebar as profile.html -->
+            {% include 'account/sidebar.html' %}
+        </div>
+        
+        <div class="profile-content">
+            <h2 class="mb-30">Your Wishlist</h2>
+            
+            <div id="wishlistItems">
+                <div class="product-grid">
+                    {% for product in wishlist.products.all %}
+                    <div class="product-card" onclick="window.location.href='{% url 'product_detail' product.slug %}'">
+                        <button class="add-to-cart-btn" 
+                                data-product-id="{{ product.id }}"
+                                data-product-name="{{ product.name }}"
+                                data-product-price="{{ product.price }}"
+                                onclick="event.stopPropagation(); addToCart('{{ product.id }}', '{{ product.name }}', {{ product.price }})">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button class="wishlist-btn in-wishlist" 
+                                style="position: absolute; top: 15px; left: 15px;"
+                                data-product-id="{{ product.id }}"
+                                onclick="event.stopPropagation(); toggleWishlist('{{ product.id }}')">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                        <div class="product-image">
+                            {% if product.images.first %}
+                            <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}">
+                            {% else %}
+                            <i class="fas fa-image"></i>
+                            {% endif %}
+                        </div>
+                        <h3 class="product-name">{{ product.name }}</h3>
+                        <div class="product-price">₦{{ product.price|floatformat:2 }}</div>
+                    </div>
+                    {% empty %}
+                    <div id="emptyWishlist" class="empty-state" style="grid-column: 1 / -1;">
+                        <i class="fas fa-heart"></i>
+                        <h3>Your wishlist is empty</h3>
+                        <p>Save your favorite items here for later</p>
+                        <button class="shop-btn" onclick="window.location.href='{% url 'product_list' %}'">Continue Shopping</button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

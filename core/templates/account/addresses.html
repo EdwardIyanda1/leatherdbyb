@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div id="profile" class="page">
+    <div class="profile-container">
+        <div class="profile-sidebar">
+            <!-- Same sidebar as profile.html -->
+            {% include 'account/sidebar.html' %}
+        </div>
+        
+        <div class="profile-content">
+            <div class="section-header">
+                <h2 class="section-title">Saved Addresses</h2>
+                <button class="hero-btn" onclick="window.location.href='{% url 'address_add' %}'">Add New Address</button>
+            </div>
+            
+            <div id="addressesList" class="address-grid">
+                {% for address in addresses %}
+                <div class="address-card {% if address.is_default %}default{% endif %}">
+                    {% if address.is_default %}
+                    <div class="address-default">Default</div>
+                    {% endif %}
+                    <div class="address-type">
+                        <i class="fas fa-{{ address.type == 'home'|yesno:'home,briefcase,map-marker-alt' }}"></i>
+                        {{ address.get_type_display }} Address
+                    </div>
+                    <div class="address-details">
+                        <div><strong>{{ address.name }}</strong></div>
+                        <div>{{ address.phone }}</div>
+                        <div>{{ address.line1 }}</div>
+                        {% if address.line2 %}<div>{{ address.line2 }}</div>{% endif %}
+                        <div>{{ address.city }}, {{ address.state }}</div>
+                        {% if address.postal_code %}<div>{{ address.postal_code }}</div>{% endif %}
+                    </div>
+                    <div class="address-actions">
+                        <button class="address-action-btn address-edit" 
+                                onclick="window.location.href='{% url 'address_edit' address.id %}'">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="address-action-btn address-delete" 
+                                onclick="if(confirm('Are you sure?')) window.location.href='{% url 'address_delete' address.id %}'">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </button>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h3>No saved addresses</h3>
+                    <p>Add your shipping addresses for faster checkout</p>
+                    <button class="shop-btn" onclick="window.location.href='{% url 'address_add' %}'">Add Address</button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

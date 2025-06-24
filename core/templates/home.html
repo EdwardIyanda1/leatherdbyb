@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div id="home" class="page active">
+    <div class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Premium Leather Goods</h1>
+            <p class="hero-subtitle">Handcrafted with the finest materials for timeless elegance and durability</p>
+            <button class="hero-btn" onclick="window.location.href='{% url 'product_list' %}'">Shop Now</button>
+        </div>
+        <div class="hero-image">
+            <i class="fas fa-briefcase"></i>
+        </div>
+    </div>
+    
+    <div class="categories">
+        {% for category in categories %}
+        <div class="category-card" onclick="window.location.href='{% url 'product_list' %}?category={{ category.slug }}'">
+            <div class="category-icon">
+                <i class="fas fa-{{ category.icon }}"></i>
+            </div>
+            <div class="category-name">{{ category.name }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="section-header">
+        <h2 class="section-title">Featured Products</h2>
+        <span class="view-all" onclick="window.location.href='{% url 'product_list' %}'">View all <i class="fas fa-chevron-right"></i></span>
+    </div>
+    
+    <div class="product-grid">
+        {% for product in featured_products %}
+    {% if product.slug %}
+        <div class="product-card" onclick="window.location.href='{% url 'product_detail' product.slug %}'">
+            <button class="add-to-cart-btn" 
+                    data-product-id="{{ product.id }}"
+                    data-product-name="{{ product.name }}"
+                    data-product-price="{{ product.price }}"
+                    onclick="event.stopPropagation(); addToCart('{{ product.id }}', '{{ product.name }}', {{ product.price }})">
+                <i class="fas fa-plus"></i>
+            </button>
+            <div class="product-image">
+                {% if product.images.first %}
+                    <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                    <img src="/static/images/no-image.jpg" alt="No image">
+                {% endif %}
+            </div>
+            <div class="product-name">{{ product.name }}</div>
+            <div class="product-price">₦{{ product.price }}</div>
+        </div>
+    {% endif %}
+{% endfor %}
+
+    </div>
+    
+    <div class="section-header">
+        <h2 class="section-title">New Arrivals</h2>
+        <span class="view-all" onclick="window.location.href='{% url 'product_list' %}'">View all <i class="fas fa-chevron-right"></i></span>
+    </div>
+    
+    <div class="product-grid">
+        {% for product in new_arrivals %}
+        <div class="product-card" onclick="window.location.href='{% url 'product_detail' product.slug %}'">
+            <button class="add-to-cart-btn" 
+                    data-product-id="{{ product.id }}"
+                    data-product-name="{{ product.name }}"
+                    data-product-price="{{ product.price }}"
+                    onclick="event.stopPropagation(); addToCart('{{ product.id }}', '{{ product.name }}', {{ product.price }})">
+                <i class="fas fa-plus"></i>
+            </button>
+            <div class="product-image">
+                {% if product.images.first %}
+                <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                <i class="fas fa-image"></i>
+                {% endif %}
+            </div>
+            <h3 class="product-name">{{ product.name }}</h3>
+            <div class="product-price">₦{{ product.price|floatformat:2 }}</div>
+            <div class="product-category">{{ product.category.name }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

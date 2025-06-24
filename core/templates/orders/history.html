@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div id="history" class="page">
+    <h2 class="mb-30">Order History</h2>
+    
+    {% for order in orders %}
+    <div class="history-item">
+        <div class="order-header">
+            <span class="order-id">#{{ order.id }}</span>
+            <span class="order-status status-{{ order.status }}">
+                {{ order.get_status_display }}
+            </span>
+        </div>
+        <div class="order-date">Ordered on {{ order.created_at|date:"F j, Y" }}</div>
+        <div class="order-items">
+            {% for item in order.items.all %}
+            <div class="order-item">
+                <span class="order-item-name">{{ item.product.name }} × {{ item.quantity }}</span>
+                <span class="order-item-price">₦{{ item.total_price|floatformat:2 }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="order-total">
+            <span>Total</span>
+            <span>₦{{ order.total|floatformat:2 }}</span>
+        </div>
+        <div class="order-actions">
+            <button class="action-btn reorder-btn" onclick="window.location.href='{% url 'order_detail' order.id %}'">
+                View Details
+            </button>
+            {% if order.status == 'delivered' %}
+            <button class="action-btn reorder-btn" onclick="reorder('{{ order.id }}')">
+                Reorder
+            </button>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <div class="empty-state">
+        <i class="fas fa-history"></i>
+        <h3>No order history</h3>
+        <p>Your completed orders will appear here</p>
+        <button class="shop-btn" onclick="window.location.href='{% url 'product_list' %}'">Start Shopping</button>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function reorder(orderId) {
+    fetch(`/orders/${orderId}/reorder/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Items added to cart!');
+            window.location.href = '{% url 'cart_detail' %}';
+        }
+    });
+}
+</script>
+{% endblock %}

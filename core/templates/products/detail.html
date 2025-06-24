@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div id="product" class="page">
+    <div class="product-detail-container">
+        <div class="product-gallery">
+            <div class="product-main-image">
+                {% if product.images.first %}
+                <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                <i class="fas fa-image"></i>
+                {% endif %}
+            </div>
+            
+            <div class="product-thumbnails">
+                {% for image in product.images.all %}
+                <div class="thumbnail {% if forloop.first %}active{% endif %}" 
+                     onclick="document.querySelector('.product-main-image img').src='{{ image.image.url }}';
+                              document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+                              this.classList.add('active');">
+                    <img src="{{ image.image.url }}" alt="Thumbnail {{ forloop.counter }}">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="product-info">
+            <h1 class="product-title">{{ product.name }}</h1>
+            
+            <div class="product-rating">
+                <div class="stars">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= product.rating|floatformat:0|add:"0" %}
+                            <i class="fas fa-star"></i>
+                        {% elif forloop.counter == product.rating|floatformat:0|add:"1" and product.rating|floatformat:1|slice:"-1" == "5" %}
+                            <i class="fas fa-star-half-alt"></i>
+                        {% else %}
+                            <i class="far fa-star"></i>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <span class="rating-text">{{ product.rating|floatformat:1 }} ({{ product.review_count }} reviews)</span>
+            </div>
+            
+            <div class="product-price">₦{{ product.price|floatformat:2 }}</div>
+            
+            <div class="product-description">
+                <p>{{ product.description }}</p>
+                
+                <ul style="margin-top: 15px; padding-left: 20px;">
+                    <li style="margin-bottom: 8px;">Premium full-grain leather</li>
+                    <li style="margin-bottom: 8px;">Hand-stitched construction</li>
+                    <li style="margin-bottom: 8px;">Natural vegetable tanning</li>
+                    <li style="margin-bottom: 8px;">Lifetime guarantee</li>
+                </ul>
+            </div>
+            
+            <div class="product-actions">
+                <div class="quantity-controls">
+                    <button class="qty-btn" onclick="updateQuantity('{{ product.id }}', -1)">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <span class="qty-display" id="productQty">1</span>
+                    <button class="qty-btn" onclick="updateQuantity('{{ product.id }}', 1)">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                
+                <button class="add-to-cart-main" onclick="addToCart('{{ product.id }}', '{{ product.name }}', {{ product.price }})">
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                </button>
+                
+                <button class="wishlist-btn {% if product in wishlist.products.all %}in-wishlist{% endif %}" 
+                        title="Add to wishlist" 
+                        data-product-id="{{ product.id }}"
+                        onclick="toggleWishlist('{{ product.id }}')">
+                    <i class="{% if product in wishlist.products.all %}fas{% else %}far{% endif %} fa-heart"></i>
+                </button>
+            </div>
+            
+            <div class="product-meta">
+                <div class="meta-item">
+                    <span class="meta-label">SKU:</span>
+                    <span class="meta-value">{{ product.sku }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Category:</span>
+                    <span class="meta-value">{{ product.category.name }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Availability:</span>
+                    <span class="meta-value">
+                        {% if product.stock > 0 %}
+                            In Stock ({{ product.stock }} items)
+                        {% else %}
+                            Out of Stock
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="related-products" style="margin-top: 60px;">
+        <div class="section-header">
+            <h2 class="section-title">You May Also Like</h2>
+            <span class="view-all" onclick="window.location.href='{% url 'product_list' %}'">View all <i class="fas fa-chevron-right"></i></span>
+        </div>
+        
+        <div class="product-grid">
+            {% for product in related_products %}
+            <div class="product-card" onclick="window.location.href='{% url 'product_detail' product.slug %}'">
+                <button class="add-to-cart-btn" 
+                        data-product-id="{{ product.id }}"
+                        data-product-name="{{ product.name }}"
+                        data-product-price="{{ product.price }}"
+                        onclick="event.stopPropagation(); addToCart('{{ product.id }}', '{{ product.name }}', {{ product.price }})">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <div class="product-image">
+                    {% if product.images.first %}
+                    <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}">
+                    {% else %}
+                    <i class="fas fa-image"></i>
+                    {% endif %}
+                </div>
+                <h3 class="product-name">{{ product.name }}</h3>
+                <div class="product-price">₦{{ product.price|floatformat:2 }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div id="cart" class="page">
+    <div class="cart-header">
+        <h2 class="cart-title">Your Shopping Cart</h2>
+    </div>
+    
+    <div class="cart-container">
+        <div class="cart-items">
+            <div id="cartItems">
+                {% for item in cart.items.all %}
+                <div class="cart-item">
+                    <div class="cart-item-image">
+                        {% if item.product.images.first %}
+                        <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}">
+                        {% else %}
+                        <i class="fas fa-image"></i>
+                        {% endif %}
+                    </div>
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">{{ item.product.name }}</div>
+                        <div class="cart-item-price">₦{{ item.product.price|floatformat:2 }}</div>
+                        <div class="quantity-controls">
+                            <button class="qty-btn" onclick="updateCartItem('{{ item.product.id }}', 'decrement')">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <span class="qty-display">{{ item.quantity }}</span>
+                            <button class="qty-btn" onclick="updateCartItem('{{ item.product.id }}', 'increment')">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="remove-item" onclick="removeFromCart('{{ item.product.id }}')">
+                            <i class="fas fa-trash-alt"></i> Remove
+                        </div>
+                    </div>
+                    <div style="font-weight: 600;">₦{{ item.total_price|floatformat:2 }}</div>
+                </div>
+                {% empty %}
+                <div id="emptyCart" class="empty-state">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3>Your cart is empty</h3>
+                    <p>Start shopping to add items to your cart</p>
+                    <button class="shop-btn" onclick="window.location.href='{% url 'home' %}'">Continue Shopping</button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        {% if cart.items.exists %}
+        <div class="cart-summary">
+            <h3 class="summary-title">Order Summary</h3>
+            
+            <div class="summary-row">
+                <span class="summary-label">Subtotal</span>
+                <span class="summary-value">₦{{ cart.subtotal|floatformat:2 }}</span>
+            </div>
+            
+            <div class="summary-row">
+                <span class="summary-label">Shipping</span>
+                <span class="summary-value">₦2,000.00</span>
+            </div>
+            
+            <div class="summary-row">
+                <span class="summary-label">Tax</span>
+                <span class="summary-value">₦1,500.00</span>
+            </div>
+            
+            <div class="summary-row summary-total">
+                <span>Total</span>
+                <span>₦{{ cart.total|floatformat:2 }}</span>
+            </div>
+            
+            {% if request.user.is_authenticated %}
+            <button class="checkout-btn" onclick="window.location.href='{% url 'checkout' %}'">Proceed to Checkout</button>
+            {% else %}
+            <button class="checkout-btn" onclick="window.location.href='{% url 'login' %}?next={% url 'checkout' %}'">Login to Checkout</button>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateCartItem(productId, action) {
+    const url = action === 'increment' ? 
+        `/cart/add/${productId}/` : 
+        `/cart/remove/${productId}/`;
+    
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        }
+    });
+}
+
+function removeFromCart(productId) {
+    if (confirm('Are you sure you want to remove this item?')) {
+        fetch(`/cart/remove/${productId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            }
+        });
+    }
+}
+</script>
+{% endblock %}
