@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from .models import (
     Product, Category, Cart, CartItem, 
@@ -116,35 +117,73 @@ def cart_detail(request):
     }
     return render(request, 'cart/detail.html', context)
 
+@require_POST
 def cart_add(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     cart = _get_cart(request)
-    
+
     cart_item, created = CartItem.objects.get_or_create(
         cart=cart,
         product=product,
         defaults={'quantity': 1}
     )
-    
+
     if not created:
         cart_item.quantity += 1
         cart_item.save()
-    
-    messages.success(request, f"{product.name} added to cart!")
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({
+            'success': True,
+            'quantity': cart_item.quantity,
+            'item_total': float(cart_item.total_price),
+            'cart_subtotal': float(cart.subtotal),
+            'cart_total': float(cart.total),
+            'cart_total_items': cart.total_items
+        })
+
     return redirect('cart_detail')
 
+@require_POST
 def cart_remove(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     cart = _get_cart(request)
-    
+
     try:
         cart_item = CartItem.objects.get(cart=cart, product=product)
-        cart_item.delete()
-        messages.success(request, f"{product.name} removed from cart!")
+        cart_item.quantity -= 1
+        if cart_item.quantity > 0:
+            cart_item.save()
+        else:
+            cart_item.delete()
+
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'quantity': cart_item.quantity if cart_item.pk else 0,
+                'item_total': float(cart_item.total_price) if cart_item.pk else 0,
+                'cart_subtotal': float(cart.subtotal),
+                'cart_total': float(cart.total),
+                'cart_total_items': cart.total_items
+            })
+
     except CartItem.DoesNotExist:
-        messages.error(request, "Item not found in cart")
-    
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': False})
+
     return redirect('cart_detail')
+
+def our_craft(request):
+    return render(request, 'info/our_craft.html')
+
+def care_guide(request):
+    return render(request, 'info/care_guide.html')
+
+def shipping_returns(request):
+    return render(request, 'info/shipping_returns.html')
+
+def privacy_policy(request):
+    return render(request, 'info/privacy_policy.html')
 
 def cart_update(request, product_id):
     if request.method == 'POST' and request.is_ajax():
@@ -219,6 +258,36 @@ def checkout(request):
 
 @login_required
 def account_dashboard(request):
+    user = request.user
+    profile = user.userprofile
+
+    if request.method == 'POST':
+        full_name = request.POST.get('full_name')
+        phone = request.POST.get('phone')
+        date_of_birth = request.POST.get('date_of_birth')
+        gender = request.POST.get('gender')
+        profile_image = request.FILES.get('profile_image')
+
+        # Handle full name
+        if full_name:
+            name_parts = full_name.strip().split()
+            user.first_name = name_parts[0]
+            user.last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else ''
+            user.save()
+
+        # Handle UserProfile fields
+        profile.phone = phone
+        profile.gender = gender
+        profile.date_of_birth = date_of_birth or None
+
+        if profile_image:
+            profile.profile_image = profile_image
+
+        profile.save()
+
+        messages.success(request, "Profile updated successfully!")
+        return redirect('account_dashboard')
+
     return render(request, 'account/profile.html')
 
 @login_required

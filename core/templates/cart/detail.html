@@ -11,7 +11,7 @@
         <div class="cart-items">
             <div id="cartItems">
                 {% for item in cart.items.all %}
-                <div class="cart-item">
+                <div class="cart-item" data-product-id="{{ item.product.id }}">
                     <div class="cart-item-image">
                         {% if item.product.images.first %}
                         <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}">
@@ -23,15 +23,15 @@
                         <div class="cart-item-name">{{ item.product.name }}</div>
                         <div class="cart-item-price">₦{{ item.product.price|floatformat:2 }}</div>
                         <div class="quantity-controls">
-                            <button class="qty-btn" onclick="updateCartItem('{{ item.product.id }}', 'decrement')">
+                            <button class="qty-btn" onclick="updateCartItem({{ item.product.id }}, 'decrement')">
                                 <i class="fas fa-minus"></i>
                             </button>
                             <span class="qty-display">{{ item.quantity }}</span>
-                            <button class="qty-btn" onclick="updateCartItem('{{ item.product.id }}', 'increment')">
+                            <button class="qty-btn" onclick="updateCartItem({{ item.product.id }}, 'increment')">
                                 <i class="fas fa-plus"></i>
                             </button>
                         </div>
-                        <div class="remove-item" onclick="removeFromCart('{{ item.product.id }}')">
+                        <div class="remove-item" onclick="removeFromCart({{ item.product.id }})">
                             <i class="fas fa-trash-alt"></i> Remove
                         </div>
                     </div>
@@ -85,16 +85,24 @@
 
 {% block extra_js %}
 <script>
+function getCSRFToken() {
+    return '{{ csrf_token }}';
+}
+
 function updateCartItem(productId, action) {
-    const url = action === 'increment' ? 
-        `/cart/add/${productId}/` : 
-        `/cart/remove/${productId}/`;
-    
+    let url = '';
+    if (action === 'increment') {
+        url = `{% url 'cart_add' 0 %}`.replace('0', productId);
+    } else {
+        url = `{% url 'cart_remove' 0 %}`.replace('0', productId);
+    }
+
     fetch(url, {
         method: 'POST',
         headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-        },
+            'X-CSRFToken': getCSRFToken(),
+            'Accept': 'application/json',
+        }
     })
     .then(response => response.json())
     .then(data => {
@@ -106,11 +114,13 @@ function updateCartItem(productId, action) {
 
 function removeFromCart(productId) {
     if (confirm('Are you sure you want to remove this item?')) {
-        fetch(`/cart/remove/${productId}/`, {
+        const url = `{% url 'cart_remove' 0 %}`.replace('0', productId);
+        fetch(url, {
             method: 'POST',
             headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-            },
+                'X-CSRFToken': getCSRFToken(),
+                'Accept': 'application/json',
+            }
         })
         .then(response => response.json())
         .then(data => {

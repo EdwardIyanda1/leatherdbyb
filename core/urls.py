@@ -1,11 +1,18 @@
 from django.urls import path, include
 from . import views
+from django.contrib.auth import views as auth_views
+# from django.contrib.auth.views import LogoutView
 from .views import checkout
 from .views import address_add, address_edit
 
 urlpatterns = [
     path('checkout/', checkout, name='checkout'),
     path('', views.home, name='home'),
+    path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('our-craft/', views.our_craft, name='our_craft'),
+    path('care-guide/', views.care_guide, name='care_guide'),
+    path('shipping-returns/', views.shipping_returns, name='shipping_returns'),
+    path('privacy-policy/', views.privacy_policy, name='privacy_policy'),
     path('account/addresses/add/', address_add, name='address_add'),
     path('account/addresses/<int:pk>/edit/', address_edit, name='address_edit'),
     path('order-success/', views.order_success, name='order_success'),

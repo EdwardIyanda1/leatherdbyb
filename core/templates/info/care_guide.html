@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="info-section">
+    <div class="info-container">
+        <h1 class="info-title">Care Guide</h1>
+        <p class="info-subtitle">Preserve the elegance and durability of your leather goods with our expert care tips.</p>
+
+        <div class="info-content">
+            <div class="info-card">
+                <h3>1. Regular Cleaning</h3>
+                <p>Wipe down your leather products using a soft, dry or slightly damp cloth. Avoid soaking the leather or using harsh cleaning products.</p>
+            </div>
+            <div class="info-card">
+                <h3>2. Conditioning</h3>
+                <p>Use a high-quality leather conditioner every few months to keep the leather moisturized and prevent cracking or drying out.</p>
+            </div>
+            <div class="info-card">
+                <h3>3. Avoid Water</h3>
+                <p>Leather is not waterproof. If it gets wet, blot the water with a soft cloth and allow it to air dry naturally—away from direct heat or sunlight.</p>
+            </div>
+            <div class="info-card">
+                <h3>4. Storage</h3>
+                <p>Store leather goods in a cool, dry place. Use a dust bag for handbags and avoid hanging them to retain their shape.</p>
+            </div>
+            <div class="info-card">
+                <h3>5. Handle with Clean Hands</h3>
+                <p>Natural oils and dirt from your skin can stain leather over time. Always handle your leather items with clean hands.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .info-section {
+        padding: 60px 20px;
+        background: #fffaf5;
+        font-family: 'Poppins', sans-serif;
+    }
+    .info-container {
+        max-width: 960px;
+        margin: 0 auto;
+        text-align: center;
+    }
+    .info-title {
+        font-size: 36px;
+        margin-bottom: 10px;
+        color: #3b3b3b;
+    }
+    .info-subtitle {
+        font-size: 18px;
+        color: #777;
+        margin-bottom: 40px;
+    }
+    .info-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+    }
+    .info-card {
+        background: #fff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        transition: transform 0.2s;
+    }
+    .info-card:hover {
+        transform: translateY(-5px);
+    }
+    .info-card h3 {
+        color: #5c4a3f;
+        margin-bottom: 10px;
+        font-size: 20px;
+    }
+    .info-card p {
+        color: #555;
+        font-size: 16px;
+        line-height: 1.6;
+    }
+</style>
+{% endblock %}
