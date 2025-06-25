@@ -10,15 +10,15 @@ class AddressForm(forms.ModelForm):
             'state', 'postal_code', 'is_default'
         ]
         widgets = {
-            'type': forms.Select(attrs={'class': 'form-input'}),
+            'type': forms.Select(attrs={'class': 'form-select'}),
             'name': forms.TextInput(attrs={'class': 'form-input'}),
             'phone': forms.TextInput(attrs={'class': 'form-input'}),
             'line1': forms.TextInput(attrs={'class': 'form-input'}),
             'line2': forms.TextInput(attrs={'class': 'form-input'}),
             'city': forms.TextInput(attrs={'class': 'form-input'}),
-            'state': forms.Select(attrs={'class': 'form-input'}),
+            'state': forms.Select(attrs={'class': 'form-select'}),
             'postal_code': forms.TextInput(attrs={'class': 'form-input'}),
-            'is_default': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
+            'is_default': forms.CheckboxInput(attrs={'class': 'form-checkbox'})
         }
 
 class UserProfileForm(forms.ModelForm):

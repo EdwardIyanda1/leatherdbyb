@@ -5,8 +5,45 @@
 <div id="profile" class="page">
     <div class="profile-container">
         <div class="profile-sidebar">
-            <!-- Same sidebar as profile.html -->
-            {% include 'account/sidebar.html' %}
+            <div class="user-info">
+                <div class="user-avatar-large">
+                    {% if user.userprofile.profile_image %}
+                    <img src="{{ user.userprofile.profile_image.url }}" alt="{{ user.username }}">
+                    {% else %}
+                    <i class="fas fa-user"></i>
+                    {% endif %}
+                </div>
+                <h3 class="user-name">{{ user.get_full_name|default:user.username }}</h3>
+                <p class="user-email">{{ user.email }}</p>
+            </div>
+            
+            <ul class="profile-nav">
+                <li class="profile-nav-item">
+                    <a class="profile-nav-link active" href="{% url 'account_dashboard' %}">
+                        <i class="fas fa-user-circle"></i> Account
+                    </a>
+                </li>
+                <li class="profile-nav-item">
+                    <a class="profile-nav-link" href="{% url 'address_list' %}">
+                        <i class="fas fa-map-marker-alt"></i> Addresses
+                    </a>
+                </li>
+                <li class="profile-nav-item">
+                    <a class="profile-nav-link" href="{% url 'wishlist' %}">
+                        <i class="fas fa-heart"></i> Wishlist
+                    </a>
+                </li>
+                <li class="profile-nav-item">
+                    <a class="profile-nav-link" href="{% url 'account_dashboard' %}">
+                        <i class="fas fa-cog"></i> Settings
+                    </a>
+                </li>
+                <li class="profile-nav-item">
+                    <a class="profile-nav-link" href="{% url 'logout' %}">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </li>
+            </ul>
         </div>
         
         <div class="profile-content">
@@ -22,7 +59,12 @@
                     <div class="address-default">Default</div>
                     {% endif %}
                     <div class="address-type">
-                        <i class="fas fa-{{ address.type == 'home'|yesno:'home,briefcase,map-marker-alt' }}"></i>
+                        <i class="fas 
+                            {% if address.type == 'home' %}fa-home
+                            {% elif address.type == 'work' %}fa-briefcase
+                            {% else %}fa-map-marker-alt
+                            {% endif %}">
+                        </i>
                         {{ address.get_type_display }} Address
                     </div>
                     <div class="address-details">

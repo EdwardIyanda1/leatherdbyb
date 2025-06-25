@@ -1,10 +1,14 @@
 from django.urls import path, include
 from . import views
 from .views import checkout
+from .views import address_add, address_edit
 
 urlpatterns = [
     path('checkout/', checkout, name='checkout'),
     path('', views.home, name='home'),
+    path('account/addresses/add/', address_add, name='address_add'),
+    path('account/addresses/<int:pk>/edit/', address_edit, name='address_edit'),
+    path('order-success/', views.order_success, name='order_success'),
     path('products/', views.product_list, name='product_list'),
     path('products/<slug:slug>/', views.product_detail, name='product_detail'),
     path('cart/', views.cart_detail, name='cart_detail'),

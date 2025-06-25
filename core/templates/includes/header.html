@@ -1,249 +1,577 @@
-<nav class="desktop-nav">
-    <!-- Left side with logo -->
-    <div class="nav-left">
-        <div class="logo">LeatherdbyB</div>
+<nav class="main-nav">
+    <!-- Logo/Brand -->
+    <div class="nav-brand">
+        <a href="{% url 'home' %}" class="logo">LeatherdbyB</a>
     </div>
 
-    <!-- Middle section with search -->
-    <div class="nav-middle">
-        <div class="search-bar">
-            <form method="GET" action="{% url 'product_list' %}">
+    <!-- Primary Navigation (Desktop) -->
+    <div class="nav-primary">
+        <a class="nav-item {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">Home</a>
+        <a class="nav-item {% if request.path == '/products/' %}active{% endif %}" href="{% url 'product_list' %}">Products</a>
+        <a class="nav-item {% if request.path == '/account/orders/' %}active{% endif %}" href="{% url 'order_history' %}">Orders</a>
+        <a class="nav-item {% if request.path == '/about/' %}active{% endif %}" href="{% url 'about' %}">About</a>
+    </div>
+
+    <!-- Secondary Navigation (Search, Account, Cart) -->
+    <div class="nav-secondary">
+        <!-- Search -->
+        <div class="search-container">
+            <form method="GET" action="{% url 'product_list' %}" class="search-form">
                 <input type="text" class="search-input" name="search" placeholder="Search products..." 
-                       value="{{ request.GET.search }}">
-                <button type="submit" class="search-icon"><i class="fas fa-search"></i></button>
+                       value="{{ request.GET.search }}" aria-label="Search products">
+                <button type="submit" class="search-button" aria-label="Submit search">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                    </svg>
+                </button>
             </form>
         </div>
-    </div>
 
-    <!-- Right-side navigation -->
-    <div class="nav-right">
-        <!-- Menu Toggle Icon (visible on mobile) -->
-        <div class="menu-toggle" onclick="toggleMenu()">
-            <i class="fas fa-bars"></i>
-        </div>
-
-        <!-- Regular navigation links (hidden on mobile) -->
-        <div class="nav-links" id="navLinks">
-            <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">Home</a>
-            <a class="nav-link {% if request.path == '/products/' %}active{% endif %}" href="{% url 'product_list' %}">Products</a>
-            <a class="nav-link {% if request.path == '/account/orders/' %}active{% endif %}" href="{% url 'order_history' %}">Orders</a>
-            <a class="nav-link {% if request.path == '/about/' %}active{% endif %}" href="{% url 'about' %}">About</a>
-        </div>
-
-        <!-- Profile and cart (always visible) -->
-        <div class="nav-icons">
-            <div class="cart-badge" onclick="window.location.href='{% url 'cart_detail' %}'">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="cart-count" id="cartCount">{{ cart.total_items }}</span>
+        <!-- Cart -->
+        <div class="cart-container" onclick="window.location.href='{% url 'cart_detail' %}'">
+            <div class="cart-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                </svg>
+                <span class="cart-badge">{{ cart.total_items }}</span>
             </div>
+        </div>
 
-            <div class="user-avatar" onclick="window.location.href='{% url 'account_dashboard' %}'">
+        <!-- Account -->
+        <div class="account-dropdown">
+            <button class="account-toggle" aria-label="Account menu">
                 {% if request.user.is_authenticated %}
                     {% if request.user.userprofile.profile_image %}
-                        <img src="{{ request.user.userprofile.profile_image.url }}" alt="Profile">
+                        <img src="{{ request.user.userprofile.profile_image.url }}" alt="Profile" class="account-avatar">
                     {% else %}
-                        <i class="fas fa-user"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                        </svg>
                     {% endif %}
                 {% else %}
-                    <i class="fas fa-user"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                    </svg>
+                {% endif %}
+            </button>
+            <div class="dropdown-menu">
+                {% if request.user.is_authenticated %}
+                    <a href="{% url 'account_dashboard' %}" class="dropdown-item">My Account</a>
+                    <a href="{% url 'order_history' %}" class="dropdown-item">Order History</a>
+                    {% comment %} <a href="{% url 'account_logout' %}" class="dropdown-item">Logout</a> {% endcomment %}
+                {% else %}
+                    <a href="{% url 'account_login' %}" class="dropdown-item">Login</a>
+                    <a href="{% url 'account_signup' %}" class="dropdown-item">Register</a>
                 {% endif %}
             </div>
         </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle" aria-label="Toggle navigation" onclick="toggleMobileMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+            </svg>
+        </button>
     </div>
 
-    <!-- Mobile menu (hidden by default) -->
+    <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
-        <a class="mobile-link {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">Home</a>
-        <a class="mobile-link {% if request.path == '/products/' %}active{% endif %}" href="{% url 'product_list' %}">Products</a>
-        <a class="mobile-link {% if request.path == '/account/orders/' %}active{% endif %}" href="{% url 'order_history' %}">Orders</a>
-        <a class="mobile-link {% if request.path == '/about/' %}active{% endif %}" href="{% url 'about' %}">About</a>
-        <a class="mobile-link {% if request.path == '/account/' %}active{% endif %}" href="{% url 'account_dashboard' %}">Profile</a>
+        <div class="mobile-menu-header">
+            <span class="mobile-menu-title">Menu</span>
+            <button class="mobile-menu-close" onclick="toggleMobileMenu()" aria-label="Close menu">
+                &times;
+            </button>
+        </div>
+        <div class="mobile-search-container">
+            <form method="GET" action="{% url 'product_list' %}" class="mobile-search-form">
+                <input type="text" class="mobile-search-input" name="search" placeholder="Search products..." 
+                       value="{{ request.GET.search }}" aria-label="Search products">
+                <button type="submit" class="mobile-search-button" aria-label="Submit search">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                    </svg>
+                </button>
+            </form>
+        </div>
+        <a class="mobile-nav-item {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">Home</a>
+        <a class="mobile-nav-item {% if request.path == '/products/' %}active{% endif %}" href="{% url 'product_list' %}">Products</a>
+        <a class="mobile-nav-item {% if request.path == '/account/orders/' %}active{% endif %}" href="{% url 'order_history' %}">Orders</a>
+        <a class="mobile-nav-item {% if request.path == '/about/' %}active{% endif %}" href="{% url 'about' %}">About</a>
+        {% comment %} <div class="mobile-nav-divider"></div> {% endcomment %}
+        {% if request.user.is_authenticated %}
+            <a class="mobile-nav-item" href="{% url 'account_dashboard' %}">My Account</a>
+            {% comment %} <a class="mobile-nav-item" href="{% url 'account_logout' %}">Logout</a> {% endcomment %}
+        {% else %}
+            <a class="mobile-nav-item" href="{% url 'account_login' %}">Login</a>
+            <a class="mobile-nav-item" href="{% url 'account_signup' %}">Register</a>
+        {% endif %}
     </div>
 </nav>
 
 <style>
-/* Base styles */
-    .desktop-nav {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem 2rem;
-        background-color: #fff;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        position: relative;
-    }
-    
-    .nav-left, .nav-right {
-        display: flex;
-        align-items: center;
-    }
-    
-    .logo {
-        font-weight: bold;
-        font-size: 1.5rem;
-        margin-right: 2rem;
-    }
-    
-    .menu-toggle {
-        display: none;
-        cursor: pointer;
-        font-size: 1.5rem;
-    }
-    
-    .nav-links {
-        display: flex;
+/* Base Styles */
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #e74c3c;
+    --text-color: #333;
+    --light-gray: #f8f9fa;
+    --medium-gray: #e9ecef;
+    --dark-gray: #6c757d;
+    --transition-speed: 0.3s;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.main-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1000;
+}
+
+/* Brand/Logo */
+.nav-brand .logo {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-decoration: none;
+    letter-spacing: -0.5px;
+}
+
+/* Primary Navigation */
+.nav-primary {
+    display: flex;
+    gap: 2rem;
+    margin-left: 2rem;
+}
+
+.nav-item {
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    position: relative;
+    padding: 0.5rem 0;
+    transition: color var(--transition-speed);
+}
+
+.nav-item:hover {
+    color: var(--secondary-color);
+}
+
+.nav-item.active {
+    color: var(--secondary-color);
+    font-weight: 600;
+}
+
+.nav-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--secondary-color);
+}
+
+/* Secondary Navigation */
+.nav-secondary {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+/* Search */
+.search-container {
+    position: relative;
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    padding: 0.6rem 1rem;
+    padding-right: 2.5rem;
+    border: 1px solid var(--medium-gray);
+    border-radius: 30px;
+    width: 220px;
+    font-size: 0.9rem;
+    transition: all var(--transition-speed);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
+}
+
+.search-button {
+    position: absolute;
+    right: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--dark-gray);
+    transition: color var(--transition-speed);
+}
+
+.search-button:hover {
+    color: var(--secondary-color);
+}
+
+/* Cart */
+.cart-container {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cart-icon {
+    position: relative;
+    color: var(--text-color);
+    transition: color var(--transition-speed);
+}
+
+.cart-icon:hover {
+    color: var(--secondary-color);
+}
+
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: var(--secondary-color);
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* Account Dropdown */
+.account-dropdown {
+    position: relative;
+}
+
+.account-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 50%;
+    transition: background-color var(--transition-speed);
+}
+
+.account-toggle:hover {
+    background-color: var(--light-gray);
+}
+
+.account-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+.dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.5rem);
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all var(--transition-speed);
+    z-index: 100;
+}
+
+.account-dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background-color var(--transition-speed);
+}
+
+.dropdown-item:hover {
+    background-color: var(--light-gray);
+    color: var(--secondary-color);
+}
+
+/* Mobile Menu Toggle (hidden on desktop) */
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-color);
+    padding: 0.5rem;
+}
+
+/* Mobile Menu (hidden on desktop) */
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 320px;
+    height: 100vh;
+    background-color: white;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1100;
+    transition: right 0.3s ease;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-menu.show {
+    right: 0;
+}
+
+.mobile-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--medium-gray);
+}
+
+.mobile-menu-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.mobile-menu-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--dark-gray);
+    padding: 0 0.5rem;
+}
+
+.mobile-search-container {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--medium-gray);
+}
+
+.mobile-search-form {
+    position: relative;
+}
+
+.mobile-search-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    padding-right: 2.5rem;
+    border: 1px solid var(--medium-gray);
+    border-radius: 30px;
+    font-size: 0.9rem;
+}
+
+.mobile-search-button {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--dark-gray);
+}
+
+.mobile-nav-item {
+    display: block;
+    padding: 1rem 1.5rem;
+    color: var(--text-color);
+    text-decoration: none;
+    border-bottom: 1px solid var(--medium-gray);
+    font-weight: 500;
+    transition: background-color var(--transition-speed);
+}
+
+.mobile-nav-item:hover {
+    background-color: var(--light-gray);
+}
+
+.mobile-nav-item.active {
+    color: var(--secondary-color);
+    font-weight: 600;
+}
+
+.mobile-nav-divider {
+    height: 1px;
+    background-color: var(--medium-gray);
+    margin: 0.5rem 0;
+}
+
+/* Overlay for mobile menu */
+{% comment %} .mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1099;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+} {% endcomment %}
+
+.mobile-menu-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+    .nav-primary {
         gap: 1.5rem;
-    }
-    
-    .nav-link {
-        text-decoration: none;
-        color: #333;
-        font-weight: 500;
-    }
-    
-    .nav-link.active {
-        color: #000;
-        font-weight: 600;
-    }
-    
-    .search-bar {
-        position: relative;
-        margin-right: 1rem;
+        margin-left: 1rem;
     }
     
     .search-input {
-        padding: 0.5rem 1rem;
-        border: 1px solid #ddd;
-        border-radius: 20px;
-        width: 200px;
-    }
-    
-    .search-icon {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: none;
-        border: none;
-        cursor: pointer;
-    }
-    
-    .cart-badge {
-        position: relative;
-        cursor: pointer;
-        margin-right: 1.5rem;
-        font-size: 1.2rem;
-    }
-    
-    .cart-count {
-        position: absolute;
-        top: -8px;
-        right: -8px;
-        background-color: #000;
-        color: white;
-        border-radius: 50%;
-        width: 18px;
-        height: 18px;
-        font-size: 0.7rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .user-avatar {
-        cursor: pointer;
-    }
-    
-    .user-avatar img {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-    
-    /* Mobile styles */
-    @media (max-width: 768px) {
-        .desktop-nav {
-            padding: 1rem;
-            flex-wrap: wrap;
-        }
-        
-        .menu-toggle {
-            display: block;
-        }
-        
-        .nav-links {
-            display: none;
-            flex-direction: column;
-            width: 100%;
-            padding: 1rem 0;
-            gap: 1rem;
-        }
-        
-        .nav-links.show {
-            display: flex;
-        }
-        
-        .nav-right {
-            display: none;
-        }
-        
-        .mobile-only {
-            display: block;
-            margin-top: 1rem;
-            border-top: 1px solid #eee;
-            padding-top: 1rem;
-        }
-        
-        .mobile-search {
-            width: 100%;
-            margin: 1rem 0;
-        }
-        
-        .mobile-search .search-input {
-            width: 100%;
-        }
-        
-        .mobile-profile {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem;
-            color: #333;
-        }
-        
-        .mobile-avatar {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-        }
-    }
-</style>
-<script>
-function toggleMenu() {
-    const mobileMenu = document.getElementById('mobileMenu');
-    const navMiddle = document.querySelector('.nav-middle');
-    
-    mobileMenu.classList.toggle('show');
-    navMiddle.classList.toggle('mobile-search');
-    
-    // Close menu when clicking outside
-    if (mobileMenu.classList.contains('show')) {
-        document.addEventListener('click', closeMenuOnClickOutside);
-    } else {
-        document.removeEventListener('click', closeMenuOnClickOutside);
+        width: 180px;
     }
 }
 
-function closeMenuOnClickOutside(event) {
-    const mobileMenu = document.getElementById('mobileMenu');
-    const menuToggle = document.querySelector('.menu-toggle');
-    const navRight = document.querySelector('.nav-right');
+@media (max-width: 768px) {
+    .main-nav {
+        padding: 1rem;
+    }
     
-    if (!mobileMenu.contains(event.target) && !menuToggle.contains(event.target) && !navRight.contains(event.target)) {
-        mobileMenu.classList.remove('show');
-        document.querySelector('.nav-middle').classList.remove('mobile-search');
-        document.removeEventListener('click', closeMenuOnClickOutside);
+    .nav-primary {
+        display: none;
+    }
+    
+    .search-container {
+        display: none;
+    }
+    
+    .account-dropdown {
+        display: none;
+    }
+    
+    .mobile-menu-toggle {
+        display: block;
+    }
+    
+    .cart-container {
+        margin-right: 0.5rem;
     }
 }
+
+@media (max-width: 480px) {
+    .mobile-menu {
+        width: 280px;
+    }
+    
+    .nav-brand .logo {
+        font-size: 1.5rem;
+    }
+}
+</style>
+
+<script>
+function toggleMobileMenu() {
+    const mobileMenu = document.getElementById('mobileMenu');
+    const body = document.body;
+    
+    mobileMenu.classList.toggle('show');
+    
+    // Create or remove overlay
+    let overlay = document.querySelector('.mobile-menu-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'mobile-menu-overlay';
+        document.body.appendChild(overlay);
+    }
+    
+    overlay.classList.toggle('show');
+    
+    // Toggle body scroll
+    body.classList.toggle('no-scroll');
+    
+    // Close menu when clicking overlay
+    overlay.onclick = function() {
+        mobileMenu.classList.remove('show');
+        overlay.classList.remove('show');
+        body.classList.remove('no-scroll');
+    };
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    const accountDropdowns = document.querySelectorAll('.account-dropdown');
+    
+    accountDropdowns.forEach(dropdown => {
+        if (!dropdown.contains(event.target)) {
+            const menu = dropdown.querySelector('.dropdown-menu');
+            if (menu) {
+                menu.style.opacity = '0';
+                menu.style.visibility = 'hidden';
+                menu.style.transform = 'translateY(-10px)';
+            }
+        }
+    });
+});
+
+// Initialize dropdowns
+document.querySelectorAll('.account-toggle').forEach(toggle => {
+    toggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const menu = this.closest('.account-dropdown').querySelector('.dropdown-menu');
+        const isVisible = menu.style.visibility === 'visible';
+        
+        // Close all other dropdowns first
+        document.querySelectorAll('.dropdown-menu').forEach(m => {
+            if (m !== menu) {
+                m.style.opacity = '0';
+                m.style.visibility = 'hidden';
+                m.style.transform = 'translateY(-10px)';
+            }
+        });
+        
+        // Toggle current dropdown
+        if (isVisible) {
+            menu.style.opacity = '0';
+            menu.style.visibility = 'hidden';
+            menu.style.transform = 'translateY(-10px)';
+        } else {
+            menu.style.opacity = '1';
+            menu.style.visibility = 'visible';
+            menu.style.transform = 'translateY(0)';
+        }
+    });
+});
 </script>

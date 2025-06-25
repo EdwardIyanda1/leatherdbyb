@@ -52,6 +52,51 @@ def product_detail(request, slug):
     }
     return render(request, 'products/detail.html', context)
 
+@login_required
+def address_add(request):
+    if request.method == 'POST':
+        form = AddressForm(request.POST)
+        if form.is_valid():
+            address = form.save(commit=False)
+            address.user = request.user
+            address.save()
+            
+            if address.is_default:
+                # Ensure only one default address
+                Address.objects.filter(user=request.user).exclude(id=address.id).update(is_default=False)
+            
+            return redirect('address_list')
+    else:
+        form = AddressForm()
+    
+    return render(request, 'account/address_form.html', {
+        'form': form,
+        'title': 'Add New Address'
+    })
+
+@login_required
+def address_edit(request, pk):
+    address = get_object_or_404(Address, id=pk, user=request.user)
+    
+    if request.method == 'POST':
+        form = AddressForm(request.POST, instance=address)
+        if form.is_valid():
+            address = form.save()
+            
+            if address.is_default:
+                # Ensure only one default address
+                Address.objects.filter(user=request.user).exclude(id=address.id).update(is_default=False)
+            
+            return redirect('address_list')
+    else:
+        form = AddressForm(instance=address)
+    
+    return render(request, 'account/address_form.html', {
+        'form': form,
+        'title': 'Edit Address'
+    })
+
+
 def _get_cart(request):
     if request.user.is_authenticated:
         cart, created = Cart.objects.get_or_create(user=request.user)
@@ -183,6 +228,10 @@ def address_list(request):
         'addresses': addresses,
     }
     return render(request, 'account/addresses.html', context)
+
+def order_success(request):
+    reference = request.GET.get('reference')
+    return render(request, 'order_success.html', {'reference': reference})
 
 @login_required
 def address_add(request):

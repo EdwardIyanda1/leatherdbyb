@@ -1,4 +1,5 @@
 from django.db import models
+from decimal import Decimal
 from django.utils.text import slugify
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
@@ -66,12 +67,21 @@ class UserProfile(models.Model):
 
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    
+
     class AddressType(models.TextChoices):
         HOME = 'home', _('Home')
         WORK = 'work', _('Work')
         OTHER = 'other', _('Other')
-    
+
+    STATE_CHOICES = [
+        ('oyo', 'Oyo'),
+        ('lagos', 'Lagos'),
+        ('kaduna', 'Kaduna'),
+        # Add more states as needed
+    ]
+
+    state = models.CharField(max_length=100, choices=STATE_CHOICES)  # ✅ Only this one
+
     type = models.CharField(
         max_length=10,
         choices=AddressType.choices,
@@ -82,34 +92,39 @@ class Address(models.Model):
     line1 = models.CharField(max_length=255)
     line2 = models.CharField(max_length=255, blank=True)
     city = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
     postal_code = models.CharField(max_length=20)
     is_default = models.BooleanField(default=False)
-    
+
     class Meta:
         verbose_name_plural = "Addresses"
-    
+
     def __str__(self):
         return f"{self.name} - {self.line1}, {self.city}"
+
 
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     session_key = models.CharField(max_length=40, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
-    @property
-    def total_items(self):
-        return self.items.aggregate(total=models.Sum('quantity'))['total'] or 0
-    
+
     @property
     def subtotal(self):
         return sum(item.total_price for item in self.items.all())
-    
+
+    @property
+    def total(self):
+        return self.subtotal + Decimal('2000.00') + Decimal('1500.00')  # Shipping + Tax
+
+    @property
+    def total_items(self):
+        return self.items.aggregate(total=models.Sum('quantity'))['total'] or 0
+
     def __str__(self):
         if self.user:
             return f"Cart for {self.user.username}"
         return f"Anonymous Cart ({self.session_key})"
+
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
