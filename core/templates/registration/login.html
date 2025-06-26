@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | LeatheredbyB</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-container {
+            background: #0B1E3D; /* Deep Blue */
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-container h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 28px;
+            text-align: center;
+        }
+
+        .login-container form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-container input[type="text"],
+        .login-container input[type="password"] {
+            padding: 12px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 6px;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .login-container button {
+            background-color: #ffffff;
+            color: #0B1E3D;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .login-container button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .login-container p {
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .login-container a {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        .error {
+            background-color: #ffcccc;
+            color: #660000;
+            padding: 10px;
+            margin-bottom: 16px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login to LeatheredbyB</h2>
+        
+        {% if form.errors %}
+            <div class="error">
+                Invalid username or password. Please try again.
+            </div>
+        {% endif %}
+        
+        <form method="post">
+            {% csrf_token %}
+            {{ form.username.label_tag }}
+            {{ form.username }}
+            {{ form.password.label_tag }}
+            {{ form.password }}
+
+            <button type="submit">Login</button>
+        </form>
+
+        <p>Don't have an account?
+            <a href="{% url 'signup' %}">Register here</a>
+        </p>
+    </div>
+</body>
+</html>

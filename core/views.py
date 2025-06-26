@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
+from django.contrib.auth.forms import UserCreationForm
 from .models import (
     Product, Category, Cart, CartItem, 
     Order, OrderItem, Wishlist, Address, UserProfile
@@ -20,6 +21,7 @@ def home(request):
         'new_arrivals': new_arrivals,
     }
     return render(request, 'home.html', context)
+
 
 def product_list(request):
     categories = Category.objects.all()
@@ -182,6 +184,16 @@ def care_guide(request):
 def shipping_returns(request):
     return render(request, 'info/shipping_returns.html')
 
+def signup_view(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')  # redirect after successful signup
+    else:
+        form = UserCreationForm()
+    return render(request, 'registration/signup.html', {'form': form})
+
 def privacy_policy(request):
     return render(request, 'info/privacy_policy.html')
 
@@ -259,7 +271,7 @@ def checkout(request):
 @login_required
 def account_dashboard(request):
     user = request.user
-    profile = user.userprofile
+    profile, created = UserProfile.objects.get_or_create(user=user)
 
     if request.method == 'POST':
         full_name = request.POST.get('full_name')

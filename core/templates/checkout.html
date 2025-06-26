@@ -44,7 +44,7 @@
                 
                 <div class="form-group">
                     <label>Shipping Address</label>
-                    <select name="address" class="form-control" required>
+                    <select name="address" class="form-control" required >
                         <option value="">Select an address</option>
                         {% for address in addresses %}
                         <option value="{{ address.id }}" {% if address.is_default %}selected{% endif %}>

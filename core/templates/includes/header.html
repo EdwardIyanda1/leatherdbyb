@@ -1,10 +1,10 @@
 <nav class="main-nav">
-    <!-- Logo/Brand -->
+    
     <div class="nav-brand">
         <a href="{% url 'home' %}" class="logo">LeatherdbyB</a>
     </div>
 
-    <!-- Primary Navigation (Desktop) -->
+    
     <div class="nav-primary">
         <a class="nav-item {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">Home</a>
         <a class="nav-item {% if request.path == '/products/' %}active{% endif %}" href="{% url 'product_list' %}">Products</a>
@@ -12,9 +12,9 @@
         <a class="nav-item {% if request.path == '/about/' %}active{% endif %}" href="{% url 'about' %}">About</a>
     </div>
 
-    <!-- Secondary Navigation (Search, Account, Cart) -->
+    
     <div class="nav-secondary">
-        <!-- Search -->
+        
         <div class="search-container">
             <form method="GET" action="{% url 'product_list' %}" class="search-form">
                 <input type="text" class="search-input" name="search" placeholder="Search products..." 
@@ -27,7 +27,7 @@
             </form>
         </div>
 
-        <!-- Cart -->
+        
         <div class="cart-container" onclick="window.location.href='{% url 'cart_detail' %}'">
             <div class="cart-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
@@ -37,7 +37,7 @@
             </div>
         </div>
 
-        <!-- Account -->
+        
         <div class="account-dropdown">
             <button class="account-toggle" aria-label="Account menu">
                 {% if request.user.is_authenticated %}
@@ -60,13 +60,13 @@
                     <a href="{% url 'order_history' %}" class="dropdown-item">Order History</a>
                     {% comment %} <a href="{% url 'account_logout' %}" class="dropdown-item">Logout</a> {% endcomment %}
                 {% else %}
-                    <a href="{% url 'account_login' %}" class="dropdown-item">Login</a>
-                    <a href="{% url 'account_signup' %}" class="dropdown-item">Register</a>
+                    <a href="{% url 'login' %}" class="dropdown-item">Login</a>
+                    <a href="{% url 'signup' %}" class="dropdown-item">Register</a> {# Optional - see note below #}
                 {% endif %}
             </div>
         </div>
 
-        <!-- Mobile Menu Toggle -->
+        
         <button class="mobile-menu-toggle" aria-label="Toggle navigation" onclick="toggleMobileMenu()">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
@@ -74,7 +74,7 @@
         </button>
     </div>
 
-    <!-- Mobile Menu -->
+    
     <div class="mobile-menu" id="mobileMenu">
         <div class="mobile-menu-header">
             <span class="mobile-menu-title">Menu</span>
@@ -102,8 +102,8 @@
             <a class="mobile-nav-item" href="{% url 'account_dashboard' %}">My Account</a>
             {% comment %} <a class="mobile-nav-item" href="{% url 'account_logout' %}">Logout</a> {% endcomment %}
         {% else %}
-            <a class="mobile-nav-item" href="{% url 'account_login' %}">Login</a>
-            <a class="mobile-nav-item" href="{% url 'account_signup' %}">Register</a>
+            <a class="mobile-nav-item" href="{% url 'login' %}">Login</a>
+            <a class="mobile-nav-item" href="{% url 'signup' %}">Register</a>
         {% endif %}
     </div>
 </nav>

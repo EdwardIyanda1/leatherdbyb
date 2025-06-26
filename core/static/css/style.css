@@ -1240,6 +1240,10 @@
                 grid-template-columns: repeat(2, 1fr);
             }
             
+            .form-control{
+                width: 100px;
+            }
+
             .categories {
                 flex-direction: column;
             }
@@ -1737,15 +1741,13 @@
     gap: 1rem;
   }
   
+  /* .form-control{
+    width: 100px;
+  } */
+
   .cart-badge, .user-avatar {
     transform: scale(0.9);
   }
-}
-
-.hero-image img {
-    width: 100%;
-    height: 40%;
-    border-radius: 10px; /* optional */
 }
 
 .info-page {
