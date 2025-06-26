@@ -45,6 +45,7 @@ class ProductImage(models.Model):
         return f"Image for {self.product.name}"
 
 class UserProfile(models.Model):
+    email_notifications = models.BooleanField(default=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=20, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div id="settings" class="page">
+    <div class="profile-container">
+        
+        <!-- Sidebar Navigation -->
+        <div class="profile-sidebar">
+            <div class="user-info">
+                <div class="user-avatar-large">
+                    {% if user.userprofile.profile_image %}
+                    <img src="{{ user.userprofile.profile_image.url }}" alt="{{ user.username }}">
+                    {% else %}
+                    <i class="fas fa-user"></i>
+                    {% endif %}
+                </div>
+                <h3 class="user-name">{{ user.get_full_name|default:user.username }}</h3>
+                <p class="user-email">{{ user.email }}</p>
+            </div>
+
+            <ul class="profile-nav">
+                <li class="profile-nav-item">
+                    <a class="profile-nav-link" href="{% url 'account_dashboard' %}">
+                        <i class="fas fa-user-circle"></i> Account
+                    </a>
+                </li>
+                <li class="profile-nav-item">
+                    <a class="profile-nav-link" href="{% url 'address_list' %}">
+                        <i class="fas fa-map-marker-alt"></i> Addresses
+                    </a>
+                </li>
+                <li class="profile-nav-item">
+                    <a class="profile-nav-link" href="{% url 'wishlist' %}">
+                        <i class="fas fa-heart"></i> Wishlist
+                    </a>
+                </li>
+                <li class="profile-nav-item">
+                    <a class="profile-nav-link active" href="{% url 'account_settings' %}">
+                        <i class="fas fa-cog"></i> Settings
+                    </a>
+                </li>
+                <li class="profile-nav-item">
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="profile-nav-link" style="background: none; border: none; padding: 0; cursor: pointer;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Settings Area -->
+        <div class="profile-content">
+            <h2 class="mb-30">Account Settings</h2>
+
+            <form method="post" action="{% url 'account_settings' %}">
+                {% csrf_token %}
+
+                <!-- Password Update Section -->
+                <div class="form-group">
+                    <label class="form-label">Change Password</label>
+                    <input type="password" class="form-input" name="current_password" placeholder="Current Password" required>
+                    <input type="password" class="form-input" name="new_password" placeholder="New Password" required>
+                    <input type="password" class="form-input" name="confirm_password" placeholder="Confirm New Password" required>
+                </div>
+
+                <!-- Email Preferences -->
+                <div class="form-group">
+                    <label class="form-label">Receive Promotional Emails</label>
+                    <select class="form-input" name="email_notifications">
+                        <option value="enabled" {% if user.userprofile.email_notifications %}selected{% endif %}>Yes</option>
+                        <option value="disabled" {% if not user.userprofile.email_notifications %}selected{% endif %}>No</option>
+                    </select>
+                </div>
+
+                <!-- Delivery Preferences (optional future expansion) -->
+                
+                <div class="form-group">
+                    <label class="form-label">Preferred Delivery Method</label>
+                    <select class="form-input" name="delivery_method">
+                        <option value="standard">Standard</option>
+                        <option value="express">Express</option>
+                        <option value="pickup">Pickup Point</option>
+                    </select>
+                </div>
+                
+
+                <button type="submit" class="save-btn">Update Settings</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

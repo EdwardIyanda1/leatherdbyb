@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
+from django.contrib.auth import update_session_auth_hash
+from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from .models import (
     Product, Category, Cart, CartItem, 
@@ -22,6 +24,38 @@ def home(request):
     }
     return render(request, 'home.html', context)
 
+@login_required
+def account_settings(request):
+    user = request.user
+    profile = user.userprofile
+
+    if request.method == 'POST':
+        # Handle password change
+        current_pw = request.POST.get('current_password')
+        new_pw = request.POST.get('new_password')
+        confirm_pw = request.POST.get('confirm_password')
+
+        if request.user.check_password(current_pw):
+            if new_pw == confirm_pw:
+                request.user.set_password(new_pw)
+                request.user.save()
+                update_session_auth_hash(request, request.user)  # Keep user logged in
+            else:
+                messages.error(request, "New passwords do not match.")
+        else:
+            messages.error(request, "Current password is incorrect.")
+
+        # Handle email notification setting
+        notif_pref = request.POST.get('email_notifications') == "enabled"
+        profile = request.user.userprofile
+        profile.email_notifications = notif_pref
+        profile.save()
+
+
+        messages.success(request, 'Settings updated.')
+        return redirect('account_settings')
+
+    return render(request, 'account/settings.html')
 
 def product_list(request):
     categories = Category.objects.all()
