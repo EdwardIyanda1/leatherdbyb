@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Redirecting You...{% endblock %}
+
+{% block extra_css %}
+<style>
+    .redirect-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 70vh;
+        padding: 40px 20px;
+        text-align: center;
+        background-color: #f9f9f9;
+    }
+
+    .redirect-box {
+        background: #fff;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        max-width: 500px;
+        width: 100%;
+    }
+
+    .redirect-title {
+        font-size: 22px;
+        font-weight: bold;
+        color: #0a1172;
+        margin-bottom: 10px;
+    }
+
+    .redirect-subtext {
+        font-size: 15px;
+        color: #555;
+        margin-bottom: 25px;
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 6px solid #e3e3e3;
+        border-top: 6px solid #468EFD;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .redirect-link {
+        font-size: 14px;
+        color: #468EFD;
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="redirect-section">
+    <div class="redirect-box">
+        <div class="spinner"></div>
+        <div class="redirect-title">You are being redirected</div>
+        <div class="redirect-subtext">You're leaving LeatheredbyB and going to an external site.</div>
+        <a href="{{ redirect_url }}" class="redirect-link" target="_blank" rel="noopener noreferrer">
+            Click here if not redirected in a few seconds
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    setTimeout(() => {
+        window.location.href = "{{ redirect_url }}";
+    }, 3000); // 3 seconds delay
+</script>
+{% endblock %}

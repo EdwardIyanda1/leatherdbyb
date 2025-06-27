@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found - LeatheredbyB{% endblock %}
+
+{% block content %}
+<style>
+    .error-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        min-height: 70vh;
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .error-code {
+        font-size: 120px;
+        color: #0a1172;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .error-message {
+        font-size: 24px;
+        color: #444;
+        margin-bottom: 15px;
+    }
+
+    .error-description {
+        font-size: 16px;
+        color: #666;
+        max-width: 500px;
+        margin: 0 auto 30px;
+    }
+
+    .error-btn {
+        background-color: #468EFD;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 14px;
+        transition: 0.3s ease;
+    }
+
+    .error-btn:hover {
+        background-color: #337ee0;
+    }
+</style>
+
+<div class="error-section">
+    <div class="error-code">404</div>
+    <div class="error-message">Oops! Page Not Found</div>
+    <div class="error-description">
+        The page you are looking for doesn’t exist or has been moved. Please check the URL or return to the homepage.
+    </div>
+    <a href="{% url 'home' %}" class="error-btn">Go to Homepage</a>
+</div>
+{% endblock %}

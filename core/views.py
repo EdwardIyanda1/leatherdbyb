@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from decimal import Decimal
+from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.contrib.auth import update_session_auth_hash
@@ -349,6 +351,13 @@ def checkout(request):
         'addresses': addresses,
     }
     return render(request, 'checkout.html', context)
+
+def external_redirect_view(request):
+    url = request.GET.get('url')
+    if not url or not (url.startswith('http://') or url.startswith('https://')):
+        return render(request, '404.html', status=404)
+
+    return render(request, 'redirecting.html', {'redirect_url': url})
 
 @login_required
 def account_dashboard(request):

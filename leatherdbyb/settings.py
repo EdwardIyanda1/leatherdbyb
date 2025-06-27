@@ -72,7 +72,7 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ['*']
 
 

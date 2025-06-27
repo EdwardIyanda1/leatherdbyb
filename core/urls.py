@@ -1,5 +1,7 @@
 from django.urls import path, include
 from . import views
+from .views import external_redirect_view
+from django.shortcuts import render
 from django.contrib.auth import views as auth_views
 # from django.contrib.auth.views import LogoutView
 from .views import checkout
@@ -8,6 +10,7 @@ from .views import address_add, address_edit
 urlpatterns = [
     path('checkout/', checkout, name='checkout'),
     path('', views.home, name='home'),
+    path('go/', external_redirect_view, name='external_redirect'),
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('our-craft/', views.our_craft, name='our_craft'),
     path('care-guide/', views.care_guide, name='care_guide'),
@@ -38,3 +41,8 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('accounts/', include('django.contrib.auth.urls')),
 ]
+
+def custom_404_view(request, exception):
+    return render(request, '404.html', status=404)
+
+handler404 = 'yourproject.views.custom_404_view'

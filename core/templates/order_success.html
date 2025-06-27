@@ -1,10 +1,165 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+<style>
+    .info-section {
+        padding: 40px 20px;
+        background-color: #f9f9f9;
+    }
+
+    .info-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .info-title {
+        color: #0a1172;
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    .info-description {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #555;
+        font-size: 16px;
+    }
+
+    .info-text {
+        text-align: center;
+        font-size: 15px;
+        color: #444;
+        margin-bottom: 20px;
+    }
+
+    .order-details h3 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        color: #0a1172;
+    }
+
+    .order-status-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        font-size: 12px;
+        border-radius: 20px;
+        text-transform: capitalize;
+        background-color: #e1ecf4;
+        color: #0a1172;
+        font-weight: bold;
+    }
+
+    .order-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        font-size: 14px;
+    }
+
+    .order-table th, .order-table td {
+        padding: 12px;
+        border: 1px solid #eaeaea;
+        text-align: left;
+    }
+
+    .order-table th {
+        background-color: #f0f4f8;
+        color: #0a1172;
+        font-weight: bold;
+    }
+
+    .order-table img.order-item-image {
+        height: 40px;
+        width: 40px;
+        object-fit: cover;
+        margin-right: 10px;
+        vertical-align: middle;
+        border-radius: 6px;
+    }
+
+    .order-item-name {
+        display: flex;
+        align-items: center;
+    }
+
+    .order-total-row {
+        background-color: #f9fafc;
+        font-weight: bold;
+    }
+
+    .order-actions {
+        text-align: center;
+    }
+
+    .hero-btn {
+        display: inline-block;
+        background-color: #468EFD;
+        color: white;
+        padding: 12px 25px;
+        font-size: 14px;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: 0.3s ease;
+    }
+
+    .hero-btn:hover {
+        background-color: #337ee0;
+    }
+
+    /* Responsive Table */
+    @media (max-width: 768px) {
+        .order-table, .order-table thead, .order-table tbody, .order-table th, .order-table td, .order-table tr {
+            display: block;
+            width: 100%;
+        }
+
+        .order-table thead {
+            display: none;
+        }
+
+        .order-table tr {
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .order-table td {
+            text-align: right;
+            padding-left: 50%;
+            position: relative;
+        }
+
+        .order-table td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 15px;
+            width: 45%;
+            text-align: left;
+            font-weight: bold;
+            color: #0a1172;
+        }
+
+        .order-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .hero-btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="info-section">
     <div class="info-container">
-        <h1 style="color: green;">✅ You reached the order_success view!</h1>
-
         <h1 class="info-title">Thank You for Your Order!</h1>
         <p class="info-description">
             Your payment was successful. We've received your order and will process it shortly.
@@ -17,20 +172,54 @@
         {% endif %}
 
         {% if order %}
-            <div class="info-text mt-30">
-                <h3>Order #{{ order.id }}</h3>
-                <ul class="info-list">
+        <div class="order-details mt-30">
+            <h3>Order #{{ order.id }}</h3>
+            <p><strong>Order Date:</strong> {{ order.created_at|date:"F j, Y" }}</p>
+            <p><strong>Status:</strong> <span class="order-status-badge status-{{ order.status|lower }}">{{ order.status }}</span></p>
+            
+            <table class="order-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
                     {% for item in order.items.all %}
-                    <li>{{ item.product.name }} × {{ item.quantity }} - ₦{{ item.total_price|floatformat:2 }}</li>
+                    <tr>
+                        <td data-label="Product">
+                            <div class="order-item-name">
+                                {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="order-item-image">
+                                {% endif %}
+                                {{ item.product.name }}
+                            </div>
+                        </td>
+                        <td data-label="Price">₦{{ item.price|floatformat:2 }}</td>
+                        <td data-label="Quantity">{{ item.quantity }}</td>
+                        <td data-label="Total">₦{{ item.total_price|floatformat:2 }}</td>
+                    </tr>
                     {% endfor %}
-                </ul>
-                <p><strong>Total:</strong> ₦{{ order.total|floatformat:2 }}</p>
-            </div>
-            {% endif %}
+                    
+                    <tr class="order-total-row">
+                        <td colspan="3" style="text-align: right;"><strong>Total:</strong></td>
+                        <td>₦{{ order.total|floatformat:2 }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
 
-        <a href="{% url 'home' %}" class="hero-btn" style="margin-top: 20px;">
-            Continue Shopping
-        </a>
+        <div class="order-actions" style="margin-top: 30px;">
+            <a href="{% url 'home' %}" class="hero-btn">
+                Continue Shopping
+            </a>
+            <a href="{% url 'order_history' %}" class="hero-btn" style="background: #eff6ff; color: #0a1172;">
+                View Order History
+            </a>
+        </div>
     </div>
 </div>
 {% endblock %}
