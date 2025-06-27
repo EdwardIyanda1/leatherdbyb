@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from decimal import Decimal
+import json
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.decorators.http import require_POST
@@ -10,7 +11,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from .models import (
-    Product, Category, Cart, CartItem, 
+    Product, Category, Cart, CartItem, Size, 
     Order, OrderItem, Wishlist, Address, UserProfile
 )
 from .forms import AddressForm
@@ -86,11 +87,19 @@ def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug)
     related_products = Product.objects.filter(category=product.category).exclude(id=product.id)[:4]
     
-    context = {
+    # Initialize wishlist as None for anonymous users
+    wishlist = None
+    if request.user.is_authenticated:
+        wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+
+    sizes = product.available_sizes.all()
+
+    return render(request, 'products/detail.html', {
         'product': product,
         'related_products': related_products,
-    }
-    return render(request, 'products/detail.html', context)
+        'wishlist': wishlist,
+        'sizes': sizes
+    })
 
 @login_required
 def address_add(request):
@@ -161,14 +170,39 @@ def cart_add(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     cart = _get_cart(request)
 
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid request data'}, status=400)
+
+    selected_size = data.get('size')
+    quantity = data.get('quantity', 1)
+
+    if not selected_size:
+        return JsonResponse({'error': 'Please select a size.'}, status=400)
+
+    try:
+        size_id = int(selected_size)
+        size = Size.objects.get(id=size_id)
+    except (ValueError, Size.DoesNotExist):
+        return JsonResponse({'error': 'Invalid size selected.'}, status=400)
+
+    try:
+        quantity = int(quantity)
+        if quantity < 1:
+            raise ValueError
+    except ValueError:
+        return JsonResponse({'error': 'Invalid quantity provided.'}, status=400)
+
     cart_item, created = CartItem.objects.get_or_create(
         cart=cart,
         product=product,
-        defaults={'quantity': 1}
+        size=size,
+        defaults={'quantity': quantity}
     )
 
     if not created:
-        cart_item.quantity += 1
+        cart_item.quantity += quantity  # ✅ Use the selected quantity
         cart_item.save()
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -182,6 +216,7 @@ def cart_add(request, product_id):
         })
 
     return redirect('cart_detail')
+
 
 @login_required
 def order_success(request):
@@ -235,29 +270,33 @@ def cart_remove(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     cart = _get_cart(request)
 
+    full_delete = request.GET.get('full_delete') == '1'
+
     try:
         cart_item = CartItem.objects.get(cart=cart, product=product)
-        cart_item.quantity -= 1
-        if cart_item.quantity > 0:
-            cart_item.save()
-        else:
+        if full_delete:
             cart_item.delete()
+        else:
+            cart_item.quantity -= 1
+            if cart_item.quantity > 0:
+                cart_item.save()
+            else:
+                cart_item.delete()
 
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({
                 'success': True,
                 'quantity': cart_item.quantity if cart_item.pk else 0,
-                'item_total': float(cart_item.total_price) if cart_item.pk else 0,
                 'cart_subtotal': float(cart.subtotal),
                 'cart_total': float(cart.total),
                 'cart_total_items': cart.total_items
             })
-
     except CartItem.DoesNotExist:
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': False})
 
     return redirect('cart_detail')
+
 
 def our_craft(request):
     return render(request, 'info/our_craft.html')
@@ -400,56 +439,6 @@ def address_list(request):
         'addresses': addresses,
     }
     return render(request, 'account/addresses.html', context)
-
-
-
-@login_required
-def address_add(request):
-    if request.method == 'POST':
-        form = AddressForm(request.POST)
-        if form.is_valid():
-            address = form.save(commit=False)
-            address.user = request.user
-            address.save()
-            
-            if address.is_default:
-                # Ensure only one default address
-                Address.objects.filter(user=request.user).exclude(id=address.id).update(is_default=False)
-            
-            messages.success(request, "Address added successfully!")
-            return redirect('address_list')
-    else:
-        form = AddressForm()
-    
-    context = {
-        'form': form,
-        'title': 'Add New Address',
-    }
-    return render(request, 'account/address_form.html', context)
-
-@login_required
-def address_edit(request, pk):
-    address = get_object_or_404(Address, id=pk, user=request.user)
-    
-    if request.method == 'POST':
-        form = AddressForm(request.POST, instance=address)
-        if form.is_valid():
-            address = form.save()
-            
-            if address.is_default:
-                # Ensure only one default address
-                Address.objects.filter(user=request.user).exclude(id=address.id).update(is_default=False)
-            
-            messages.success(request, "Address updated successfully!")
-            return redirect('address_list')
-    else:
-        form = AddressForm(instance=address)
-    
-    context = {
-        'form': form,
-        'title': 'Edit Address',
-    }
-    return render(request, 'account/address_form.html', context)
 
 @login_required
 def address_delete(request, pk):

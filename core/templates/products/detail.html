@@ -67,9 +67,23 @@
                     </button>
                 </div>
                 
-                <button class="add-to-cart-main" onclick="addToCart('{{ product.id }}', '{{ product.name }}', {{ product.price }})">
+                <div class="product-size-selector">
+                    <label for="productSize" style="font-weight: bold; display: block; margin-bottom: 8px;">Choose Size:</label>
+                    <select id="productSize">
+                        <option value="">-- Select Size --</option>
+                        {% for ps in sizes %}
+                            <option value="{{ ps.size.id }}">{{ ps.size.name }}</option>
+                        {% endfor %}
+                    </select>
+
+
+                </div>
+
+                <button class="add-to-cart-main" onclick="addToCart('{{ product.id }}', '{{ product.name }}', '{{ product.price }}')">
                     <i class="fas fa-shopping-cart"></i> Add to Cart
                 </button>
+
+
                 
                 <button class="wishlist-btn {% if product in wishlist.products.all %}in-wishlist{% endif %}" 
                         title="Add to wishlist" 
@@ -132,4 +146,75 @@
         </div>
     </div>
 </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function addToCart(productId, productName, productPrice) {
+    const size = document.getElementById('productSize')?.value;
+    const quantity = parseInt(document.getElementById('productQty')?.textContent || "1");
+
+    if (!size) {
+        alert("Please select a size.");
+        return;
+    }
+
+    fetch(`/cart/add/${productId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: JSON.stringify({
+            size: size,
+            quantity: quantity
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(productName + " added to cart!");
+        } else {
+            alert(data.error || "Failed to add to cart.");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Something went wrong.");
+    });
+}
+
+function updateQuantity(productId, change) {
+    const qtyDisplay = document.getElementById('productQty');
+    let currentQty = parseInt(qtyDisplay.textContent || "1");
+
+    let newQty = currentQty + change;
+    if (newQty < 1) {
+        newQty = 1;
+    }
+
+    qtyDisplay.textContent = newQty;
+}
+
+</script>
+
 {% endblock %}

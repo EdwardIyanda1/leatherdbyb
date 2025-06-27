@@ -1,20 +1,4 @@
-// Cart functionality
-function addToCart(productId, productName, price) {
-    fetch(`/cart/add/${productId}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken'),
-            'Content-Type': 'application/json',
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showToast(`${productName} added to cart!`);
-            updateCartCount(data.total_items);
-        }
-    });
-}
+const quantity = parseInt(document.getElementById('productQty')?.textContent || "1");
 
 function updateCartCount(count) {
     const cartCount = document.getElementById('cartCount');
@@ -65,21 +49,7 @@ function toggleWishlist(productId) {
     }
 }
 
-// Helper function to get CSRF token
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
+
 
 // Toast notifications
 function showToast(message) {
@@ -92,6 +62,61 @@ function showToast(message) {
         toast.classList.add('fade-out');
         setTimeout(() => toast.remove(), 300);
     }, 3000);
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function addToCart(productId, productName, productPrice) {
+    const quantity = parseInt(document.getElementById('productQty')?.textContent || "1");
+    const size = document.getElementById('productSize')?.value;
+
+    if (!size) {
+        alert("Please select a size.");
+        return;
+    }
+
+    fetch(`/cart/add/${productId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            size: size,
+            quantity: quantity
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            alert(`${productName} added to cart successfully!`);
+        } else {
+            alert(data.error || "Something went wrong.");
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        alert("Something went wrong.");
+    });
 }
 
 // Initialize page

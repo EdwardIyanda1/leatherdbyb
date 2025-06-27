@@ -4,15 +4,25 @@ from django.utils.text import slugify
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
+
+from django.utils.text import slugify
+
 class Category(models.Model):
     name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True, blank=True)
     icon = models.CharField(max_length=50, help_text="Font Awesome icon class")
-    
+
     class Meta:
         verbose_name_plural = "Categories"
-    
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.name
+
 
 class Product(models.Model):
     name = models.CharField(max_length=200)
@@ -131,7 +141,8 @@ class CartItem(models.Model):
     cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
-    
+    size = models.ForeignKey('Size', on_delete=models.CASCADE, null=True, blank=True)
+
     @property
     def total_price(self):
         return self.product.price * self.quantity
@@ -140,8 +151,21 @@ class CartItem(models.Model):
         return f"{self.quantity} x {self.product.name}"
 
     class Meta:
-        unique_together = ('cart', 'product')
-        
+        unique_together = ('cart', 'product', 'size')
+
+class Size(models.Model):
+    name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
+
+class ProductSize(models.Model):
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='available_sizes')
+    size = models.ForeignKey(Size, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.product.name} - {self.size.name}"
+
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True)

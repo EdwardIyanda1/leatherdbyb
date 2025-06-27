@@ -114,7 +114,7 @@ function updateCartItem(productId, action) {
 
 function removeFromCart(productId) {
     if (confirm('Are you sure you want to remove this item?')) {
-        const url = `{% url 'cart_remove' 0 %}`.replace('0', productId);
+        const url = `{% url 'cart_remove' 0 %}`.replace('0', productId) + '?full_delete=1';
         fetch(url, {
             method: 'POST',
             headers: {

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% url 'product_list' %}?category={{ category.slug }}
 
 {% block content %}
 <div id="product-tab" class="page">
