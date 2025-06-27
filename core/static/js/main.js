@@ -80,11 +80,11 @@ function getCookie(name) {
 }
 
 function addToCart(productId, productName, productPrice) {
-    const quantity = parseInt(document.getElementById('productQty')?.textContent || "1");
     const size = document.getElementById('productSize')?.value;
+    const quantity = parseInt(document.getElementById('productQty')?.textContent || "1");
 
     if (!size) {
-        alert("Please select a size.");
+        showToast("Please select a size.");
         return;
     }
 
@@ -95,29 +95,60 @@ function addToCart(productId, productName, productPrice) {
             'X-CSRFToken': getCookie('csrftoken'),
             'X-Requested-With': 'XMLHttpRequest'
         },
-        body: JSON.stringify({
-            size: size,
-            quantity: quantity
-        })
+        body: JSON.stringify({ size, quantity })
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
+    .then(res => res.json())
     .then(data => {
         if (data.success) {
-            alert(`${productName} added to cart successfully!`);
+            showToast(`${data.product_name} added to cart!`);
+            updateCartCount(data.cart_total_items);
+            updateCartModal(data);  // this is the new function
         } else {
-            alert(data.error || "Something went wrong.");
+            showToast(data.error || "Failed to add to cart.");
         }
     })
-    .catch(error => {
-        console.error('Fetch error:', error);
-        alert("Something went wrong.");
+    .catch(err => {
+        console.error(err);
+        showToast("Something went wrong.");
     });
 }
+
+function updateCartModal(data) {
+    const cartItemsContainer = document.getElementById('cartItems');
+    const existingItem = cartItemsContainer.querySelector(`.cart-item[data-product-id="${data.product_id}"]`);
+    
+    if (existingItem) {
+        const qtyDisplay = existingItem.querySelector('.qty-display');
+        const totalPrice = existingItem.querySelector('.cart-item-total');
+        qtyDisplay.textContent = data.quantity;
+        totalPrice.textContent = `₦${data.item_total.toFixed(2)}`;
+    } else {
+        const itemHTML = `
+            <div class="cart-item" data-product-id="${data.product_id}">
+                <div class="cart-item-name">${data.product_name}</div>
+                <div class="cart-item-price">₦${data.product_price.toFixed(2)}</div>
+                <div class="quantity-controls">
+                    <button class="qty-btn" onclick="updateCartItem(${data.product_id}, 'decrement')">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <span class="qty-display">${data.quantity}</span>
+                    <button class="qty-btn" onclick="updateCartItem(${data.product_id}, 'increment')">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div class="cart-item-total">₦${data.item_total.toFixed(2)}</div>
+            </div>
+        `;
+        cartItemsContainer.insertAdjacentHTML('beforeend', itemHTML);
+    }
+
+    // Update subtotal and total
+    const summarySubtotal = document.querySelector('.summary-value-subtotal');
+    const summaryTotal = document.querySelector('.summary-total span:last-child');
+    if (summarySubtotal) summarySubtotal.textContent = `₦${data.cart_subtotal.toFixed(2)}`;
+    if (summaryTotal) summaryTotal.textContent = `₦${data.cart_total.toFixed(2)}`;
+}
+
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {

@@ -171,51 +171,44 @@ def cart_add(request, product_id):
     cart = _get_cart(request)
 
     try:
-        data = json.loads(request.body)
+        data = json.loads(request.body or '{}')
     except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid request data'}, status=400)
+        data = {}
 
     selected_size = data.get('size')
-    quantity = data.get('quantity', 1)
+    quantity = int(data.get('quantity', 1))
 
     if not selected_size:
-        return JsonResponse({'error': 'Please select a size.'}, status=400)
-
-    try:
-        size_id = int(selected_size)
-        size = Size.objects.get(id=size_id)
-    except (ValueError, Size.DoesNotExist):
-        return JsonResponse({'error': 'Invalid size selected.'}, status=400)
-
-    try:
-        quantity = int(quantity)
-        if quantity < 1:
-            raise ValueError
-    except ValueError:
-        return JsonResponse({'error': 'Invalid quantity provided.'}, status=400)
-
-    cart_item, created = CartItem.objects.get_or_create(
-        cart=cart,
-        product=product,
-        size=size,
-        defaults={'quantity': quantity}
-    )
-
-    if not created:
-        cart_item.quantity += quantity  # ✅ Use the selected quantity
+        # Look for existing item with any size for the product in the cart
+        cart_item = cart.items.filter(product=product).first()
+        if not cart_item:
+            return JsonResponse({'error': 'Size required for new item'}, status=400)
+        cart_item.quantity += 1
         cart_item.save()
+    else:
+        try:
+            size = Size.objects.get(id=int(selected_size))
+        except (ValueError, Size.DoesNotExist):
+            return JsonResponse({'error': 'Invalid size selected'}, status=400)
 
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        return JsonResponse({
-            'success': True,
-            'quantity': cart_item.quantity,
-            'item_total': float(cart_item.total_price),
-            'cart_subtotal': float(cart.subtotal),
-            'cart_total': float(cart.total),
-            'cart_total_items': cart.total_items
-        })
+        cart_item, created = CartItem.objects.get_or_create(
+            cart=cart, product=product, size=size,
+            defaults={'quantity': quantity}
+        )
+        if not created:
+            cart_item.quantity += quantity
+            cart_item.save()
 
-    return redirect('cart_detail')
+    return JsonResponse({
+        'success': True,
+        'quantity': cart_item.quantity,
+        'item_total': float(cart_item.total_price),
+        'cart_subtotal': float(cart.subtotal),
+        'cart_total': float(cart.total),
+        'cart_total_items': cart.total_items
+    })
+
+
 
 
 @login_required

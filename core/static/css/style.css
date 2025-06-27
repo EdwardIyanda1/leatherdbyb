@@ -2168,3 +2168,23 @@
         height: 50px;
     }
 }
+
+.toast-notification {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: #468EFD;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    font-size: 14px;
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 0.3s ease-out, transform 0.3s ease;
+}
+
+.toast-notification.fade-out {
+    opacity: 0;
+    transform: translateY(20px);
+}
