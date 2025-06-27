@@ -108,52 +108,146 @@
         transition: 0.3s ease;
     }
 
+    /* Extra Mobile Responsive Enhancements */
+    @media (max-width: 480px) {
+        .info-container {
+            padding: 20px;
+        }
+
+        .info-title {
+            font-size: 22px;
+        }
+
+        .info-description, .info-text {
+            font-size: 14px;
+        }
+
+        .order-table td {
+            padding-left: 45%;
+            font-size: 13px;
+        }
+
+        .order-table td::before {
+            font-size: 13px;
+            width: 40%;
+        }
+
+        .order-item-name {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .order-table img.order-item-image {
+            margin-bottom: 8px;
+            width: 35px;
+            height: 35px;
+        }
+
+        .hero-btn {
+            font-size: 13px;
+            padding: 10px 20px;
+        }
+    }
+
     .hero-btn:hover {
         background-color: #337ee0;
     }
 
-    /* Responsive Table */
     @media (max-width: 768px) {
-        .order-table, .order-table thead, .order-table tbody, .order-table th, .order-table td, .order-table tr {
-            display: block;
-            width: 100%;
-        }
-
-        .order-table thead {
-            display: none;
-        }
-
-        .order-table tr {
-            margin-bottom: 20px;
-            border-bottom: 2px solid #eee;
-        }
-
-        .order-table td {
-            text-align: right;
-            padding-left: 50%;
-            position: relative;
-        }
-
-        .order-table td::before {
-            content: attr(data-label);
-            position: absolute;
-            left: 15px;
-            width: 45%;
-            text-align: left;
-            font-weight: bold;
-            color: #0a1172;
-        }
-
-        .order-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .hero-btn {
-            width: 100%;
-        }
+    .order-table {
+        width: 100%;
+        border: 0;
     }
+
+    .order-table thead {
+        display: none;
+    }
+
+    .order-table tr {
+        display: block;
+        margin-bottom: 20px;
+        border: 1px solid #eaeaea;
+        border-radius: 8px;
+        padding: 10px;
+        background-color: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+
+    .order-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: left;
+        padding: 10px 15px;
+        border: none;
+        position: relative;
+        font-size: 14px;
+    }
+
+    .order-table td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: #0a1172;
+        flex: 1;
+        text-align: left;
+    }
+
+    .order-table td:last-child {
+        border-bottom: none;
+    }
+
+    .order-item-name {
+        flex-direction: row;
+        gap: 10px;
+    }
+
+    .order-table img.order-item-image {
+        height: 35px;
+        width: 35px;
+        margin-right: 8px;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+
+    .order-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .hero-btn {
+        width: 100%;
+        font-size: 14px;
+        padding: 12px;
+    }
+}/* Default style for table wrapper */
+.order-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Table stays in normal layout but can scroll horizontally */
+.order-table {
+    width: 100%;
+    min-width: 600px; /* Prevents cramping on small screens */
+    border-collapse: collapse;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .order-table-wrapper {
+        margin-bottom: 20px;
+    }
+
+    .order-table th,
+    .order-table td {
+        white-space: nowrap;
+    }
+}
+
+
 </style>
 {% endblock %}
 
@@ -176,7 +270,7 @@
             <h3>Order #{{ order.id }}</h3>
             <p><strong>Order Date:</strong> {{ order.created_at|date:"F j, Y" }}</p>
             <p><strong>Status:</strong> <span class="order-status-badge status-{{ order.status|lower }}">{{ order.status }}</span></p>
-            
+            <div class="order-table-wrapper">
             <table class="order-table">
                 <thead>
                     <tr>
@@ -209,6 +303,7 @@
                     </tr>
                 </tbody>
             </table>
+            </div>
         </div>
         {% endif %}
 

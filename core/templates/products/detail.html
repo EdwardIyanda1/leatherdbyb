@@ -55,8 +55,18 @@
                     <li style="margin-bottom: 8px;">Lifetime guarantee</li>
                 </ul>
             </div>
+            <div class="product-size-selector">
+            <label for="productSize" style="font-weight: bold; display: block; margin-bottom: 8px;">Choose Size:</label>
+                <select id="productSize">
+                    <option value="">-- Select Size --</option>
+                    {% for ps in sizes %}
+                        <option value="{{ ps.size.id }}">{{ ps.size.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
             
             <div class="product-actions">
+                
                 <div class="quantity-controls">
                     <button class="qty-btn" onclick="updateQuantity('{{ product.id }}', -1)">
                         <i class="fas fa-minus"></i>
@@ -67,17 +77,7 @@
                     </button>
                 </div>
                 
-                <div class="product-size-selector">
-                    <label for="productSize" style="font-weight: bold; display: block; margin-bottom: 8px;">Choose Size:</label>
-                    <select id="productSize">
-                        <option value="">-- Select Size --</option>
-                        {% for ps in sizes %}
-                            <option value="{{ ps.size.id }}">{{ ps.size.name }}</option>
-                        {% endfor %}
-                    </select>
-
-
-                </div>
+                
 
                 <button class="add-to-cart-main" onclick="addToCart('{{ product.id }}', '{{ product.name }}', '{{ product.price }}')">
                     <i class="fas fa-shopping-cart"></i> Add to Cart

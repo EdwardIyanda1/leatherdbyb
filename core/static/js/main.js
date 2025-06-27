@@ -58,6 +58,8 @@ function showToast(message) {
     toast.textContent = message;
     document.body.appendChild(toast);
     
+    toast.innerHTML = `<i class="fas fa-check-circle" style="margin-right: 8px;"></i>${message}`;
+
     setTimeout(() => {
         toast.classList.add('fade-out');
         setTimeout(() => toast.remove(), 300);

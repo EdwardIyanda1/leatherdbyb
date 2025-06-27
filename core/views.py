@@ -179,37 +179,42 @@ def cart_add(request, product_id):
     quantity = int(data.get('quantity', 1))
 
     if not selected_size:
-        # Look for existing item with any size for the product in the cart
         cart_item = cart.items.filter(product=product).first()
         if not cart_item:
-            return JsonResponse({'error': 'Size required for new item'}, status=400)
+            return JsonResponse({'success': False, 'error': 'Size required for new item'})
         cart_item.quantity += 1
         cart_item.save()
     else:
         try:
             size = Size.objects.get(id=int(selected_size))
         except (ValueError, Size.DoesNotExist):
-            return JsonResponse({'error': 'Invalid size selected'}, status=400)
+            return JsonResponse({'success': False, 'error': 'Invalid size selected'})
+
+        if product.stock < quantity:
+            return JsonResponse({'success': False, 'error': f'Only {product.stock} items in stock'})
 
         cart_item, created = CartItem.objects.get_or_create(
             cart=cart, product=product, size=size,
             defaults={'quantity': quantity}
         )
         if not created:
+            if product.stock < cart_item.quantity + quantity:
+                return JsonResponse({'success': False, 'error': f'Only {product.stock} items in stock'})
             cart_item.quantity += quantity
             cart_item.save()
 
     return JsonResponse({
         'success': True,
+        'message': f"{product.name} added to cart!",
+        'product_id': product.id,
+        'product_name': product.name,
+        'product_price': float(product.price),
         'quantity': cart_item.quantity,
         'item_total': float(cart_item.total_price),
         'cart_subtotal': float(cart.subtotal),
         'cart_total': float(cart.total),
         'cart_total_items': cart.total_items
     })
-
-
-
 
 @login_required
 def order_success(request):
@@ -241,10 +246,13 @@ def order_success(request):
     for item in cart.items.all():
         OrderItem.objects.create(
             order=order,
+            size=item.size,
             product=item.product,
             quantity=item.quantity,
             price=item.product.price
         )
+        item.product.stock -= item.quantity
+        item.product.save()
 
     cart.items.all().delete()
 
@@ -269,24 +277,29 @@ def cart_remove(request, product_id):
         cart_item = CartItem.objects.get(cart=cart, product=product)
         if full_delete:
             cart_item.delete()
+            message = f"{product.name} removed from cart."
         else:
             cart_item.quantity -= 1
             if cart_item.quantity > 0:
                 cart_item.save()
+                message = f"{product.name} quantity updated."
             else:
                 cart_item.delete()
+                message = f"{product.name} removed from cart."
 
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({
                 'success': True,
+                'message': message,
                 'quantity': cart_item.quantity if cart_item.pk else 0,
                 'cart_subtotal': float(cart.subtotal),
                 'cart_total': float(cart.total),
                 'cart_total_items': cart.total_items
             })
+
     except CartItem.DoesNotExist:
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({'success': False})
+            return JsonResponse({'success': False, 'message': 'Item not found in cart.'})
 
     return redirect('cart_detail')
 
@@ -361,6 +374,7 @@ def checkout(request):
             for cart_item in cart.items.all():
                 OrderItem.objects.create(
                     order=order,
+                    size=cart_item.size,
                     product=cart_item.product,
                     quantity=cart_item.quantity,
                     price=cart_item.product.price
@@ -458,27 +472,49 @@ def wishlist(request):
 def wishlist_add(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     wishlist, created = Wishlist.objects.get_or_create(user=request.user)
-    
+
     if product not in wishlist.products.all():
         wishlist.products.add(product)
-        messages.success(request, f"{product.name} added to wishlist!")
+        message = f"{product.name} added to wishlist!"
+        success = True
     else:
-        messages.info(request, f"{product.name} is already in your wishlist")
-    
+        message = f"{product.name} is already in your wishlist"
+        success = False
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'success': success, 'message': message})
+
+    if success:
+        messages.success(request, message)
+    else:
+        messages.info(request, message)
+
     return redirect(request.META.get('HTTP_REFERER', 'wishlist'))
+
 
 @login_required
 def wishlist_remove(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     wishlist = get_object_or_404(Wishlist, user=request.user)
-    
+
     if product in wishlist.products.all():
         wishlist.products.remove(product)
-        messages.success(request, f"{product.name} removed from wishlist!")
+        message = f"{product.name} removed from wishlist!"
+        success = True
     else:
-        messages.error(request, "Product not found in wishlist")
-    
+        message = "Product not found in wishlist"
+        success = False
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'success': success, 'message': message})
+
+    if success:
+        messages.success(request, message)
+    else:
+        messages.error(request, message)
+
     return redirect('wishlist')
+
 
 @login_required
 def order_history(request):

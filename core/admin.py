@@ -34,10 +34,12 @@ class ProductAdmin(admin.ModelAdmin):
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0
+    # readonly_fields = ['product', 'size', 'quantity', 'price']
+    fields = ['product', 'size', 'quantity', 'price']
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user', 'total', 'status', 'created_at', 'full_delivery_address']
+    list_display = ['id', 'user', 'total', 'status', 'created_at', 'full_delivery_address', 'ordered_sizes']
     list_filter = ['status', 'created_at']
     search_fields = ['user__username', 'id']
     inlines = [OrderItemInline]
@@ -51,6 +53,18 @@ class OrderAdmin(admin.ModelAdmin):
             )
         return "No Address"
     full_delivery_address.short_description = 'Delivery Address'
+
+    def ordered_sizes(self, obj):
+        items = obj.items.select_related('product', 'size')
+        result = []
+        for item in items:
+            if item.product:
+                size_display = f" ({item.size.name})" if item.size else ""
+                result.append(f"{item.product.name}{size_display}")
+        return ", ".join(result) if result else "—"
+
+
+    ordered_sizes.short_description = 'Sizes Ordered'
 
 # ----- Address Admin -----
 
