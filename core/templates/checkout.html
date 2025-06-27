@@ -166,32 +166,28 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Paystack SDK -->
+<script src="https://js.paystack.co/v1/inline.js"></script>
+
 <script>
 document.getElementById('checkout-form').addEventListener('submit', function(e) {
     e.preventDefault();
-    
-    // In a real implementation, you would handle the payment here
-    // For Paystack integration, you would initialize the payment here
-    
-    // For now, we'll just submit the form
-    this.submit();
+    payWithPaystack();
 });
 
-// This would be your Paystack payment handler
 function payWithPaystack() {
     const handler = PaystackPop.setup({
-        key: 'YOUR_PAYSTACK_PUBLIC_KEY', // Replace with your Paystack public key
+        key: 'pk_test_d82a6709cfd5fec170010103dd47c5b493cbc01a', 
         email: '{{ request.user.email }}',
-        amount: {{ cart.total }} * 100, // Amount in kobo
+        amount: Math.round({{ cart.total|floatformat:2|add:"0" }} * 100), // Convert to Kobo
         currency: 'NGN',
-        ref: 'LEA' + Date.now(), // Generate a unique reference
+        ref: 'LEA' + Date.now(), // Unique reference
         callback: function(response) {
-            // Handle successful payment
+            // Redirect or handle order creation
             window.location.href = '{% url "order_success" %}?reference=' + response.reference;
         },
         onClose: function() {
-            // Handle when the user closes the payment modal
-            alert('Payment window closed');
+            alert('You closed the payment window.');
         }
     });
     handler.openIframe();

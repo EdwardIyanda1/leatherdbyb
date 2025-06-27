@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="info-section">
+    <div class="info-container">
+        <h1 style="color: green;">✅ You reached the order_success view!</h1>
+
+        <h1 class="info-title">Thank You for Your Order!</h1>
+        <p class="info-description">
+            Your payment was successful. We've received your order and will process it shortly.
+        </p>
+
+        {% if reference %}
+        <p class="info-text">
+            <strong>Transaction Reference:</strong> {{ reference }}
+        </p>
+        {% endif %}
+
+        {% if order %}
+            <div class="info-text mt-30">
+                <h3>Order #{{ order.id }}</h3>
+                <ul class="info-list">
+                    {% for item in order.items.all %}
+                    <li>{{ item.product.name }} × {{ item.quantity }} - ₦{{ item.total_price|floatformat:2 }}</li>
+                    {% endfor %}
+                </ul>
+                <p><strong>Total:</strong> ₦{{ order.total|floatformat:2 }}</p>
+            </div>
+            {% endif %}
+
+        <a href="{% url 'home' %}" class="hero-btn" style="margin-top: 20px;">
+            Continue Shopping
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,13 +1,272 @@
-<!-- templates/orders/detail.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Order Detail</title>
-</head>
-<body>
-    <h1>Order Details</h1>
-    <p>Order ID: {{ order.id }}</p>
-    <p>Total: ₦{{ order.total }}</p>
-    <!-- Add more order details as needed -->
-</body>
-</html>
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Order Details - LeatheredbyB{% endblock %}
+
+{% block extra_css %}
+<!-- Additional styles if needed -->
+<style>
+    .container {
+        max-width: 800px;
+        margin: auto;
+        background-color: #ffffff;
+        padding: 40px 30px;
+        border-radius: 12px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 35px;
+        font-size: 28px;
+        color: #222;
+    }
+
+    .order-info p {
+        margin: 10px 0;
+        font-size: 15px;
+    }
+
+    .label {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .product-list {
+        margin-top: 30px;
+        border-top: 1px solid #ddd;
+        padding-top: 20px;
+    }
+
+    .product-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #eee;
+        font-size: 15px;
+    }
+
+    .total {
+        text-align: right;
+        font-size: 18px;
+        font-weight: bold;
+        color: #000;
+        margin-top: 25px;
+    }
+
+    .btn-container {
+        text-align: center;
+        margin-top: 35px;
+    }
+
+    .btn {
+        background-color: #468EFD;
+        color: #fff;
+        padding: 12px 25px;
+        font-size: 14px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s ease;
+        margin: 10px;
+    }
+
+    .btn:hover {
+        background-color: #337ee0;
+    }
+
+    .qr-section {
+        text-align: center;
+        margin-top: 40px;
+    }
+
+    .qr-section canvas {
+        margin-bottom: 10px;
+    }
+
+    .qr-section p {
+        font-size: 14px;
+        color: #666;
+    }
+
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+
+        #print-section, #print-section * {
+            visibility: visible;
+        }
+
+        #print-section {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+
+        /* Optional: hide header/footer if needed */
+        header, footer, .main-nav {
+            display: none !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="container"  id="print-section">
+        <div style="margin-bottom: 20px;">
+        <a href="{% url 'order_history' %}" class="btn" style="background-color: #eee; color: #333; text-decoration: none;">
+            <i class="fas fa-arrow-left"></i> Back to Order History
+        </a>
+    </div>
+
+    <h1>Order Summary</h1>
+
+    <div class="order-info">
+        <p><span class="label">Order ID:</span> {{ order.id }}</p>
+        <p><span class="label">Customer:</span> {{ order.user.get_full_name }}</p>
+        <p><span class="label">Date:</span> {{ order.created_at|date:"F j, Y" }}</p>
+        <p><span class="label">Status:</span> {{ order.status }}</p>
+    </div>
+
+    <div class="product-list">
+        {% for item in order.items.all %}
+        <div class="product-item">
+            <div>{{ item.product.name }} (x{{ item.quantity }})</div>
+            <div>₦{{ item.total_price }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="total">
+        Total: ₦{{ order.total }}
+    </div>
+
+    <div class="qr-section">
+        <canvas id="qr-code"></canvas>
+        <p>Scan to view this order online</p>
+    </div>
+
+    <div class="btn-container">
+        <button class="btn" onclick="downloadReceipt()">Download Receipt (PDF)</button>
+        <button class="btn" onclick="window.print()">Print Receipt</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- QR code + PDF script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+
+<script>
+    // Generate QR code
+    const qr = new QRious({
+        element: document.getElementById('qr-code'),
+        value: window.location.href,
+        size: 150,
+        level: 'H'
+    });
+
+    // Download PDF function
+    function downloadReceipt() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        // === STYLING VARIABLES ===
+        const brandColor = [70, 142, 253]; // #468EFD
+        const textColor = [50, 50, 50];
+        const lightText = [130, 130, 130];
+        const lineColor = [230, 230, 230];
+        const margin = 20;
+        let y = margin;
+
+        // === HEADER (LIKE A CSS BANNER) ===
+        doc.setTextColor(...brandColor);
+        doc.setFontSize(24);
+        doc.setFont("helvetica", "bold");
+        doc.text("LeatheredbyB", margin, y);
+
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(...lightText);
+        doc.text("Premium Leather Products Receipt", margin, y + 6);
+
+        y += 12;
+        doc.setDrawColor(...lineColor);
+        doc.line(margin, y, 210 - margin, y);
+
+        // === ORDER DETAILS (LIKE A CARD SECTION) ===
+        y += 10;
+        doc.setFontSize(14);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(...textColor);
+        doc.text("Order Details", margin, y);
+
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "normal");
+        y += 8;
+        doc.text(`Order ID: {{ order.id }}`, margin, y);
+        doc.text(`Customer: {{ order.user.get_full_name }}`, margin, y += 6);
+        doc.text(`Date: {{ order.created_at|date:'F j, Y' }}`, margin, y += 6);
+        doc.text(`Status: {{ order.status }}`, margin, y += 6);
+
+        y += 4;
+        doc.line(margin, y, 210 - margin, y);
+
+        // === PRODUCT LIST ===
+        y += 10;
+        doc.setFontSize(13);
+        doc.setFont("helvetica", "bold");
+        doc.text("Products", margin, y);
+
+        y += 7;
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.text("Item", margin, y);
+        doc.text("Qty", 150, y);
+        doc.text("Price", 180, y);
+
+        y += 5;
+        doc.setFont("helvetica", "normal");
+        {% for item in order.items.all %}
+        doc.setTextColor(...textColor);
+        doc.text("{{ item.product.name }}", margin, y);
+        doc.text("{{ item.quantity }}", 150, y);
+        doc.text("₦{{ item.total_price }}", 180, y);
+        y += 6;
+        {% endfor %}
+
+        // === TOTAL SECTION ===
+        y += 4;
+        doc.setDrawColor(...lineColor);
+        doc.line(margin, y, 210 - margin, y);
+
+        y += 10;
+        doc.setFontSize(13);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(...textColor);
+        doc.text(`Total: ₦{{ order.total }}`, margin, y);
+
+        // === FOOTER ===
+        y += 25;
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "italic");
+        doc.setTextColor(...lightText);
+        doc.text("Thank you for shopping with LeatheredbyB.", margin, y);
+        doc.text("Visit us again for premium quality leather goods.", margin, y + 5);
+
+        // SAVE
+        doc.save(`LeatheredbyB_Order_{{ order.id }}.pdf`);
+    }
+
+
+
+
+</script>
+{% endblock %}

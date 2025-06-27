@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from decimal import Decimal
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.contrib.auth import update_session_auth_hash
@@ -180,6 +181,49 @@ def cart_add(request, product_id):
 
     return redirect('cart_detail')
 
+@login_required
+def order_success(request):
+    reference = request.GET.get('reference')
+    cart = _get_cart(request)
+
+    print("✅ order_success view reached with reference:", reference)
+    print("✅ Cart items count:", cart.items.count())
+
+    if not cart.items.exists():
+        messages.info(request, "Cart is empty or order already processed.")
+        return render(request, 'order_success.html', {'reference': reference})
+
+    address = Address.objects.filter(user=request.user).order_by('-is_default').first()
+    if not address:
+        messages.error(request, "No shipping address found.")
+        return redirect('checkout')
+
+    # Create Order
+    order = Order.objects.create(
+        user=request.user,
+        address=address,
+        total=cart.total,
+        shipping=Decimal('2000.00'),
+        tax=Decimal('1500.00'),
+        status='processing'
+    )
+
+    for item in cart.items.all():
+        OrderItem.objects.create(
+            order=order,
+            product=item.product,
+            quantity=item.quantity,
+            price=item.product.price
+        )
+
+    cart.items.all().delete()
+
+    print("✅ Order created successfully:", order.id)
+    return render(request, 'order_success.html', {
+        'reference': reference,
+        'order': order
+    })
+
 def some_view(request):
     if not request.session.session_key:
         request.session.save()
@@ -348,9 +392,7 @@ def address_list(request):
     }
     return render(request, 'account/addresses.html', context)
 
-def order_success(request):
-    reference = request.GET.get('reference')
-    return render(request, 'order_success.html', {'reference': reference})
+
 
 @login_required
 def address_add(request):
