@@ -180,6 +180,10 @@ def cart_add(request, product_id):
 
     return redirect('cart_detail')
 
+def some_view(request):
+    if not request.session.session_key:
+        request.session.save()
+
 @require_POST
 def cart_remove(request, product_id):
     product = get_object_or_404(Product, id=product_id)
