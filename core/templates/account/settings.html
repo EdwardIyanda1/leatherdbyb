@@ -9,11 +9,9 @@
         <div class="profile-sidebar">
             <div class="user-info">
                 <div class="user-avatar-large">
-                    {% if user.userprofile.profile_image %}
-                    <img src="{{ user.userprofile.profile_image.url }}" alt="{{ user.username }}">
-                    {% else %}
-                    <i class="fas fa-user"></i>
-                    {% endif %}
+                    <div class="avatar-placeholder">
+                        {{ user.get_full_name|default:user.username|truncatewords:2|slice:":2"|upper }}
+                    </div>
                 </div>
                 <h3 class="user-name">{{ user.get_full_name|default:user.username }}</h3>
                 <p class="user-email">{{ user.email }}</p>
