@@ -38,6 +38,7 @@ urlpatterns = [
              template_name='registration/password_reset_complete.html'
          ),
          name='password_reset_complete'),
+    path('verify/<uidb64>/<token>/', views.verify_email, name='verify_email'),
     path('go/', external_redirect_view, name='external_redirect'),
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('our-craft/', views.our_craft, name='our_craft'),

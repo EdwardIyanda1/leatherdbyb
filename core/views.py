@@ -2,6 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from decimal import Decimal
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.contrib.auth.models import User
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 import json
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -9,12 +16,13 @@ from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.contrib.auth import update_session_auth_hash
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
+from .forms import CustomUserCreationForm
 from .models import (
     Product, Category, Cart, CartItem, Size, 
     Order, OrderItem, Wishlist, Address, UserProfile
 )
 from .forms import AddressForm
+from .forms import CustomUserCreationForm
 
 def home(request):
     categories = Category.objects.all()
@@ -313,15 +321,57 @@ def care_guide(request):
 def shipping_returns(request):
     return render(request, 'info/shipping_returns.html')
 
+def verify_email(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        messages.success(request, 'Email verified successfully!')
+        return redirect('login')
+    else:
+        messages.error(request, 'Verification link is invalid or has expired.')
+        return redirect('signup')
+    
 def signup_view(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('login')  # redirect after successful signup
+            user = form.save(commit=False)
+            user.is_active = False  # Deactivate until email is verified
+            user.save()
+
+            # === EMAIL VERIFICATION START ===
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            verification_link = request.build_absolute_uri(
+                reverse('verify_email', kwargs={'uidb64': uid, 'token': token})
+            )
+
+            subject = "Verify Your Email – LeatheredbyB"
+            from_email = "LeatheredbyB <noreply@leatheredbyb.com>"
+            to_email = user.email
+
+            html_content = render_to_string("account_verification_email.html", {
+                "user": user,
+                "verification_link": verification_link,
+            })
+
+            email = EmailMultiAlternatives(subject, '', from_email, [to_email])
+            email.attach_alternative(html_content, "text/html")
+            email.send()
+            # === EMAIL VERIFICATION END ===
+
+            messages.success(request, "Registration successful. Please check your email to verify your account.")
+            return redirect('login')
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})
+
 
 def privacy_policy(request):
     return render(request, 'info/privacy_policy.html')
