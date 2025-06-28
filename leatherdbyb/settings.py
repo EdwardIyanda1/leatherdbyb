@@ -50,7 +50,10 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'edwardiyanda60@gmail.com'
 EMAIL_HOST_PASSWORD = 'kiss ujap vivn tezu'  # your app password
-DEFAULT_FROM_EMAIL = 'LeatheredbyB <edwardiyanda60@gmail.com>'
+DEFAULT_FROM_EMAIL = 'LeatherdbyB <noreply@leatherdbyb.com>'
+
+# settings.py
+PAYSTACK_SECRET_KEY = 'pk_test_d82a6709cfd5fec170010103dd47c5b493cbc01a'
 
 DATABASES = {
     'default': {

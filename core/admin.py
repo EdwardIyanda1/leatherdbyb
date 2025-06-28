@@ -4,6 +4,7 @@ from .models import (
     UserProfile, Address, Cart, CartItem,
     Order, OrderItem, Wishlist, Size, ProductSize
 )
+from .models import NewsletterSubscriber
 
 # ----- Product Inlines -----
 
@@ -11,6 +12,11 @@ class ProductSizeInline(admin.TabularInline):
     model = ProductSize
     extra = 1
 
+@admin.register(NewsletterSubscriber)
+class NewsletterSubscriberAdmin(admin.ModelAdmin):
+    list_display = ('email', 'subscribed_at')
+    search_fields = ('email',)
+    
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
     extra = 1

@@ -205,6 +205,13 @@ class OrderItem(models.Model):
         size_display = f" - {self.size.name}" if self.size else ""
         return f"{self.quantity} x {self.product.name if self.product else '[deleted]'}{size_display}"
 
+class NewsletterSubscriber(models.Model):
+    email = models.EmailField(unique=True)
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.email
+    
 class Wishlist(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     products = models.ManyToManyField(Product)

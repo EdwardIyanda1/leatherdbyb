@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from decimal import Decimal
+from django.http import HttpResponseRedirect
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.models import User
@@ -10,6 +11,13 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 import json
+import hashlib
+from .models import NewsletterSubscriber
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from django.core.mail import send_mail
+
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.decorators.http import require_POST
@@ -23,6 +31,51 @@ from .models import (
 )
 from .forms import AddressForm
 from .forms import CustomUserCreationForm
+import logging
+
+logger = logging.getLogger(__name__)
+
+@require_POST
+def newsletter_subscribe(request):
+    email = request.POST.get('email')
+    if email:
+        subscriber, created = NewsletterSubscriber.objects.get_or_create(email=email)
+
+        if created:
+            subject = "Welcome to LeatheredbyB Newsletter!"
+            html_content = render_to_string("email/newsletter_welcome.html", {"email": email})
+            msg = EmailMultiAlternatives(subject, '', settings.DEFAULT_FROM_EMAIL, [email])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+
+    return redirect('home')
+
+@csrf_exempt
+def paystack_webhook(request):
+    secret = settings.PAYSTACK_SECRET_KEY.encode()
+    signature = request.headers.get('x-paystack-signature')
+    
+    payload = request.body
+    expected_signature = hmac.new(secret, payload, hashlib.sha512).hexdigest()
+
+    if signature != expected_signature:
+        return HttpResponse(status=400)
+
+    event = json.loads(payload.decode('utf-8'))
+
+    if event['event'] == 'charge.success':
+        reference = event['data']['reference']
+        
+        # Confirm the payment and mark the order as paid
+        try:
+            order = Order.objects.get(reference=reference)
+            if not order.paid:
+                order.paid = True
+                order.save()
+        except Order.DoesNotExist:
+            pass
+
+    return HttpResponse(status=200)
 
 def home(request):
     categories = Category.objects.all()
@@ -331,7 +384,18 @@ def verify_email(request, uidb64, token):
     if user and default_token_generator.check_token(user, token):
         user.is_active = True
         user.save()
-        messages.success(request, 'Email verified successfully!')
+
+        # 🎉 Send welcome email
+        subject = "Welcome to LeatheredbyB!"
+        from_email = "LeatheredbyB <noreply@leatheredbyb.com>"
+        to_email = user.email
+
+        html_content = render_to_string("email/welcome_user.html", {"user": user})
+        email = EmailMultiAlternatives(subject, '', from_email, [to_email])
+        email.attach_alternative(html_content, "text/html")
+        email.send()
+
+        messages.success(request, 'Email verified successfully! Welcome to LeatheredbyB!')
         return redirect('login')
     else:
         messages.error(request, 'Verification link is invalid or has expired.')

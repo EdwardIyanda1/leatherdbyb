@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome to LeatheredbyB</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* Modern Email CSS Reset */
+    body, p, h1, h2, h3, ul, li {
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f8f8f8;
+      color: #333333;
+      line-height: 1.6;
+      padding: 20px;
+    }
+    
+    /* Email Container */
+    .email-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Header Section */
+    .email-header {
+      padding: 40px 40px 20px;
+      text-align: center;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .logo {
+      color: #0a1172;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    
+    .welcome-title {
+      color: #0a1172;
+      font-size: 24px;
+      font-weight: 600;
+      margin: 20px 0 10px;
+    }
+    
+    /* Content Section */
+    .email-content {
+      padding: 30px 40px;
+    }
+    
+    .greeting {
+      font-size: 16px;
+      color: #444444;
+      margin-bottom: 25px;
+    }
+    
+    .benefits-box {
+      background-color: #f9fafc;
+      border-radius: 10px;
+      padding: 25px;
+      margin: 25px 0;
+      border-left: 4px solid #0a1172;
+    }
+    
+    .benefits-title {
+      font-size: 18px;
+      color: #0a1172;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+    
+    .benefits-list {
+      list-style-type: none;
+    }
+    
+    .benefits-list li {
+      padding: 8px 0 8px 25px;
+      position: relative;
+      margin-bottom: 8px;
+      color: #555555;
+    }
+    
+    .benefits-list li:before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: #0a1172;
+      font-weight: bold;
+    }
+    
+    .cta-button {
+      display: block;
+      width: fit-content;
+      background-color: #0a1172;
+      color: #ffffff !important;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 14px 28px;
+      border-radius: 8px;
+      margin: 30px auto;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    
+    .cta-button:hover {
+      background-color: #1a2a8a;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(10, 17, 114, 0.2);
+    }
+    
+    .signature {
+      margin-top: 30px;
+      font-style: italic;
+      color: #666666;
+    }
+    
+    .team-name {
+      font-weight: 600;
+      color: #0a1172;
+    }
+    
+    /* Footer Section */
+    .email-footer {
+      padding: 25px 40px;
+      background-color: #f9f9f9;
+      text-align: center;
+      border-top: 1px solid #eeeeee;
+    }
+    
+    .social-links {
+      margin: 20px 0;
+    }
+    
+    .social-link {
+      display: inline-block;
+      margin: 0 10px;
+      color: #666666;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    
+    .social-link:hover {
+      color: #0a1172;
+    }
+    
+    .copyright {
+      font-size: 13px;
+      color: #999999;
+      margin-top: 15px;
+    }
+    
+    .unsubscribe {
+      font-size: 12px;
+      color: #999999;
+      margin-top: 20px;
+    }
+    
+    .unsubscribe a {
+      color: #999999;
+      text-decoration: underline;
+    }
+    
+    /* Responsive Adjustments */
+    @media only screen and (max-width: 600px) {
+      .email-header, .email-content, .email-footer {
+        padding: 25px;
+      }
+      
+      .welcome-title {
+        font-size: 22px;
+      }
+      
+      .cta-button {
+        width: 100%;
+        box-sizing: border-box;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="email-header">
+      <div class="logo">LeatheredbyB</div>
+      <h1 class="welcome-title">Welcome to Our Community!</h1>
+    </div>
+    
+    <div class="email-content">
+      <p class="greeting">Hi {{ user.first_name|default:"there" }},</p>
+      
+      <p>We're absolutely delighted to welcome you to the LeatheredbyB family. Your passion for quality leather goods aligns perfectly with our craftsmanship philosophy.</p>
+      
+      <div class="benefits-box">
+        <h3 class="benefits-title">Your Membership Benefits:</h3>
+        <ul class="benefits-list">
+          <li>Exclusive first access to new collections</li>
+          <li>Members-only discounts and special offers</li>
+          <li>Premium leather care guides and tutorials</li>
+          <li>Behind-the-scenes craftsmanship stories</li>
+        </ul>
+      </div>
+      
+      <p>We're committed to bringing you timeless pieces that tell a story - and now you're part of that narrative.</p>
+      
+      <a href="https://leatheredbyb.com/account/" class="cta-button">Access Your Account</a>
+      
+      <p class="signature">With warm regards,<br><span class="team-name">The LeatheredbyB Team</span></p>
+    </div>
+    
+    <div class="email-footer">
+      <div class="social-links">
+        <a href="https://instagram.com/leatheredbyb" class="social-link">Instagram</a>
+        <a href="https://facebook.com/leatheredbyb" class="social-link">Facebook</a>
+        <a href="https://wa.me/2347035883965" class="social-link">WhatsApp</a>
+        <a href="https://tiktok.com/@leatheredby_b" class="social-link">TikTok</a>
+      </div>
+      
+      <p class="copyright">&copy; {% now "Y" %} LeatheredbyB. All rights reserved.</p>
+      
+      <p class="unsubscribe">
+        <a href="{{ unsubscribe_link }}">Unsubscribe</a> from our mailing list
+      </p>
+    </div>
+  </div>
+</body>
+</html>
