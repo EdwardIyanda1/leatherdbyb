@@ -85,7 +85,9 @@ MESSAGE_TAGS = {
 
 DEBUG = True
 ALLOWED_HOSTS = ['*']
-
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 SECRET_KEY = 'r(3g4)f$502+nojhb=xed_*yk^4-^7ktruoil)^2p^$+wa9vx8'
 # Session settings

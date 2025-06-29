@@ -1,5 +1,6 @@
 from django.db import models
 from decimal import Decimal
+from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
@@ -189,7 +190,11 @@ class Order(models.Model):
     
     def __str__(self):
         return f"Order #{self.id} - {self.user.username}"
-
+    
+    def clean(self):
+        valid_statuses = [choice[0] for choice in self.Status.choices]
+        if self.status not in valid_statuses:
+            raise ValidationError(f"Invalid status: {self.status}")
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)

@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from decimal import Decimal
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 from django.http import HttpResponseRedirect
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -31,6 +33,48 @@ from .models import (
 )
 from .forms import AddressForm
 from .forms import CustomUserCreationForm
+from django.views.generic.edit import FormView
+from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.template.loader import render_to_string
+from django.core.mail import EmailMultiAlternatives
+
+
+class CustomPasswordResetView(FormView):
+    template_name = 'registration/password_reset_form.html'
+    success_url = '/accounts/password_reset/done/'
+    form_class = PasswordResetForm
+
+    def form_valid(self, form):
+        email = form.cleaned_data['email']
+        users = User.objects.filter(email=email)
+        for user in users:
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            domain = self.request.get_host()
+            protocol = 'https' if self.request.is_secure() else 'http'
+
+            html_content = render_to_string('registration/password_reset_email.html', {
+                'user': user,
+                'uid': uid,
+                'token': token,
+                'domain': domain,
+                'protocol': protocol
+            })
+
+            subject = "Reset Your Password – LeatheredbyB"
+            from_email = 'LeatheredbyB <noreply@leatheredbyb.com>'
+            to_email = user.email
+
+            email_msg = EmailMultiAlternatives(subject, '', from_email, [to_email])
+            email_msg.attach_alternative(html_content, "text/html")
+            email_msg.send()
+
+        return super().form_valid(form)
+    
 import logging
 
 logger = logging.getLogger(__name__)
@@ -318,14 +362,28 @@ def order_success(request):
     cart.items.all().delete()
 
     print("✅ Order created successfully:", order.id)
+
+    # ✅ Move the email logic here BEFORE return
+    subject = f"Your Order Confirmation – LeatheredbyB (Order #{order.id})"
+    from_email = "LeatheredbyB <noreply@leatheredbyb.com>"
+    to_email = [request.user.email]
+
+    html_content = render_to_string("email/order_confirmation.html", {
+        'user': request.user,
+        'order': order
+    })
+
+    email = EmailMultiAlternatives(subject, '', from_email, to_email)
+    email.attach_alternative(html_content, "text/html")
+    email.send()
+
+    print("✅ Order confirmation email sent to", request.user.email)
+
     return render(request, 'order_success.html', {
         'reference': reference,
         'order': order
     })
 
-def some_view(request):
-    if not request.session.session_key:
-        request.session.save()
 
 @require_POST
 def cart_remove(request, product_id):

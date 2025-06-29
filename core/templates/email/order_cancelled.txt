@@ -1,0 +1,3 @@
+Hello {{ user.first_name }},
+We're sorry to inform you that your order #{{ order.id }} has been cancelled.
+Please contact support if this was unexpected.

@@ -1,6 +1,8 @@
 from django.urls import path, include
-from django.contrib.auth import views as auth_views
+from .views import CustomPasswordResetView
 from . import views
+from django.contrib.auth import views as auth_views
+
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -9,7 +11,7 @@ urlpatterns = [
     path('order-success/', views.order_success, name='order_success'),
     path('go/', views.external_redirect_view, name='external_redirect'),
     path('paystack/webhook/', views.paystack_webhook, name='paystack_webhook'),
-
+    path('accounts/password_reset/', CustomPasswordResetView.as_view(), name='password_reset'),
     # Products & Cart
     path('products/', views.product_list, name='product_list'),
     path('products/<slug:slug>/', views.product_detail, name='product_detail'),

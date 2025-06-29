@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Cancellation Notice | LeatheredbyB</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Import styles from your main CSS file */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 40px 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .header {
+            color: #0a1172;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+
+        .notice-box {
+            background-color: #fef2f2;
+            border-left: 4px solid #ef4444;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+
+        .order-details {
+            margin: 25px 0;
+            background: #f9fbfd;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #edf2f7;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #0a1172;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 20px 0;
+            transition: all 0.2s;
+        }
+
+        .cta-button:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(10, 17, 114, 0.2);
+        }
+
+        .footer {
+            font-size: 14px;
+            color: #999;
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .email-container {
+                padding: 30px;
+            }
+            
+            .header {
+                font-size: 22px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 20px 10px;
+            }
+            
+            .email-container {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <i class="fas fa-exclamation-circle" style="color: #ef4444; margin-right: 10px;"></i>
+            Order Cancellation Notice
+        </div>
+        
+        <p>Hello {{ user.first_name }},</p>
+        
+        <div class="notice-box">
+            <p>We're sorry to inform you that your order <strong>#{{ order.id }}</strong> has been <span class="status-badge">cancelled</span>.</p>
+            {% if cancellation_reason %}
+                <p><strong>Reason:</strong> {{ cancellation_reason }}</p>
+            {% endif %}
+        </div>
+
+        <div class="order-details">
+            <h3 style="margin-top: 0; color: #0a1172;">Cancelled Order Details</h3>
+            
+            {% for item in order.items.all %}
+            <div class="order-item">
+                <div>
+                    <strong>{{ item.product.name }}</strong>
+                    <div style="color: #666; font-size: 14px;">
+                        Qty: {{ item.quantity }}
+                        {% if item.size %} | Size: {{ item.size.name }}{% endif %}
+                    </div>
+                </div>
+                <div>₦{{ item.total_price }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <h3 style="color: #0a1172;">Next Steps</h3>
+        <ul style="padding-left: 20px; margin-bottom: 25px;">
+            {% if order.payment_status == "refunded" %}
+                <li>Your refund of <strong>₦{{ order.total }}</strong> has been processed</li>
+                <li>Please allow 3-5 business days for the refund to appear in your account</li>
+            {% elif order.payment_status == "pending_refund" %}
+                <li>Your refund of <strong>₦{{ order.total }}</strong> is being processed</li>
+                <li>We'll notify you when the refund is complete</li>
+            {% endif %}
+            <li>If this cancellation was unexpected, please contact us immediately</li>
+        </ul>
+
+        <div style="text-align: center;">
+            <a href="mailto:support@leatheredbyb.com" class="cta-button">
+                <i class="fas fa-headset" style="margin-right: 8px;"></i> Contact Support
+            </a>
+            <a href="{{ shop_link }}" style="display: inline-block; margin-top: 15px; color: #0a1172; text-decoration: none;">
+                <i class="fas fa-arrow-left" style="margin-right: 5px;"></i> Continue Shopping
+            </a>
+        </div>
+
+        <div class="footer">
+            <p>We sincerely apologize for any inconvenience this may have caused.</p>
+            <p>&copy; {% now "Y" %} LeatheredbyB. All rights reserved.</p>
+            <p style="font-size: 12px; margin-top: 10px;">
+                Shomolu, Lagos
+            </p>
+        </div>
+    </div>
+</body>
+</html>
