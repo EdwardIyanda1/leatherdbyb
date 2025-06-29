@@ -1,5 +1,8 @@
 import os
 from pathlib import Path
+from decouple import config
+import dj_database_url
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 ROOT_URLCONF = 'leatherdbyb.urls'
@@ -45,21 +48,18 @@ MIDDLEWARE = [
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'edwardiyanda60@gmail.com'
-EMAIL_HOST_PASSWORD = 'kiss ujap vivn tezu'  # your app password
-DEFAULT_FROM_EMAIL = 'LeatherdbyB <noreply@leatherdbyb.com>'
+EMAIL_HOST = config("EMAIL_HOST")
+EMAIL_PORT = config("EMAIL_PORT", cast=int)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 
 # settings.py
 PAYSTACK_SECRET_KEY = 'pk_test_d82a6709cfd5fec170010103dd47c5b493cbc01a'
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": dj_database_url.config(default=config("DATABASE_URL"))
 }
 
 
@@ -83,13 +83,13 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
-DEBUG = True
-ALLOWED_HOSTS = ['*']
+DEBUG = config("DEBUG", default=False, cast=bool)
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="").split(",")
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
-SECRET_KEY = 'r(3g4)f$502+nojhb=xed_*yk^4-^7ktruoil)^2p^$+wa9vx8'
+SECRET_KEY = config("SECRET_KEY")
 # Session settings
 SESSION_COOKIE_AGE = 86400  # 1 day in seconds
 SESSION_SAVE_EVERY_REQUEST = True
