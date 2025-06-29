@@ -48,6 +48,12 @@ def run_migrations(request):
     call_command('migrate')
     return HttpResponse("✅ Migrations applied successfully.")
 
+def create_admin_user(request):
+    if not User.objects.filter(username="leatheradmin").exists():
+        User.objects.create_superuser("leatheradmin", "admin@example.com", "lbyb@2025")
+        return HttpResponse("✅ Superuser created.")
+    return HttpResponse("⚠️ Superuser already exists.")
+
 class CustomPasswordResetView(FormView):
     template_name = 'registration/password_reset_form.html'
     success_url = '/accounts/password_reset/done/'
