@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from decimal import Decimal
+from django.http import HttpResponse
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.http import HttpResponseRedirect
@@ -384,6 +385,10 @@ def order_success(request):
         'order': order
     })
 
+
+
+def health_check(request):
+    return HttpResponse("OK", status=200)
 
 @require_POST
 def cart_remove(request, product_id):
