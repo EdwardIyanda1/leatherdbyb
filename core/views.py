@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from decimal import Decimal
+from django.core.management import call_command
 from django.http import HttpResponse
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -43,6 +44,9 @@ from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 
+def run_migrations(request):
+    call_command('migrate')
+    return HttpResponse("✅ Migrations applied successfully.")
 
 class CustomPasswordResetView(FormView):
     template_name = 'registration/password_reset_form.html'

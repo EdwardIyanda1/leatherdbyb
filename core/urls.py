@@ -3,10 +3,12 @@ from .views import CustomPasswordResetView
 from . import views
 from django.contrib.auth import views as auth_views
 from core.views import health_check
+from core.views import run_migrations
 
 urlpatterns = [
     path("healthz", health_check, name="health_check"),
     path('', views.home, name='home'),
+    path("run-migrations/", run_migrations),
     path('subscribe/', views.newsletter_subscribe, name='newsletter_subscribe'),
     path('checkout/', views.checkout, name='checkout'),
     path('order-success/', views.order_success, name='order_success'),
