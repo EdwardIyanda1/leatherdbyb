@@ -66,7 +66,10 @@ def guest_checkout(request):
         return render(request, 'order_success.html', {
             'full_name': full_name,
             'email': email,
-            'address': address
+            'address': address,
+            'tax': Decimal('1500.00'),
+            'order_total': cart.total,
+            'state_choices': Address.STATE_CHOICES,
         })
 
     context = {
