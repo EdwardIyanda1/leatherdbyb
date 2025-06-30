@@ -68,7 +68,7 @@ def guest_checkout(request):
             'address': address,
             'tax': Decimal('1500.00'),
             'order_total': cart.total,
-            'state_choices': Address.STATE_CHOICES,  # ✅ keep this for POST too
+            'state_choices': Address.STATE_CHOICES, 
         })
 
     context = {
@@ -77,10 +77,18 @@ def guest_checkout(request):
         'delivery_fee': Decimal('2000.00'),
         'tax': Decimal('1500.00'),
         'order_total': cart.total,
-        'state_choices': Address.STATE_CHOICES,  # ✅ THIS was missing
+        'state_choices': Address.STATE_CHOICES,  
     }
     return render(request, 'guest_checkout.html', context)
 
+def guest_order_summary(request):
+    order_id = request.session.get('guest_order_id')
+    if not order_id:
+        return redirect('home')  # fallback if no order in session
+
+    order = get_object_or_404(Order, id=order_id)
+
+    return render(request, 'orders/guest_order_summary.html', {'order': order})
 
 class CustomPasswordResetView(FormView):
     template_name = 'registration/password_reset_form.html'

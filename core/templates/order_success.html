@@ -311,9 +311,15 @@
             <a href="{% url 'home' %}" class="hero-btn">
                 Continue Shopping
             </a>
-            <a href="{% url 'order_history' %}" class="hero-btn" style="background: #eff6ff; color: #0a1172;">
-                View Order History
-            </a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'order_history' %}" class="hero-btn" style="background: #eff6ff; color: #0a1172;">
+                    View Order History
+                </a>
+            {% else %}
+                <a href="{% url 'guest_order_summary' %}" class="hero-btn" style="background: #eff6ff; color: #0a1172;">
+                    View Order Summary
+                </a>
+            {% endif %}
         </div>
     </div>
 </div>

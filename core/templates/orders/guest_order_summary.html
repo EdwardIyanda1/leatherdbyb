@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main-content">
+  <div class="order-success-container">
+    <div class="order-success-header">
+      <div class="order-success-icon">
+        <i class="fas fa-check"></i>
+      </div>
+      <h1 class="order-success-title">Order Confirmed</h1>
+      <p class="order-success-subtitle">Thank you for your purchase!</p>
+      <p class="order-number">Order #{{ order.reference }}</p>
+    </div>
+
+    <div class="order-success-body">
+      <!-- Order Meta Information -->
+      <div class="order-meta-grid">
+        <div class="order-meta-item">
+          <div class="order-meta-label">Order Date</div>
+          <div class="order-meta-value">{{ order.created_at|date:"F j, Y, g:i a" }}</div>
+        </div>
+        <div class="order-meta-item">
+          <div class="order-meta-label">Status</div>
+          <div class="order-meta-value">
+            <span class="status-badge status-completed">{{ order.status }}</span>
+          </div>
+        </div>
+        <div class="order-meta-item">
+          <div class="order-meta-label">Total Amount</div>
+          <div class="order-meta-value">₦{{ order.total }}</div>
+        </div>
+      </div>
+
+      <!-- Order Items Table -->
+      <div class="order-table-container">
+        <table class="order-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in order.items.all %}
+            <tr>
+              <td>
+                <div class="order-item">
+                  <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="order-item-image">
+                  <span class="order-item-name">{{ item.product.name }}</span>
+                </div>
+              </td>
+              <td>₦{{ item.product.price }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>₦{{ item.total_price }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr class="order-summary-row">
+              <td colspan="3">Subtotal</td>
+              <td>₦{{ order.subtotal }}</td>
+            </tr>
+            <tr class="order-summary-row">
+              <td colspan="3">Shipping</td>
+              <td>₦{{ order.shipping_cost }}</td>
+            </tr>
+            <tr class="order-total-row">
+              <td colspan="3">Total</td>
+              <td>₦{{ order.total }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Customer Support Info -->
+      <div class="support-info">
+        <h3 class="info-title">Need Help?</h3>
+        <p class="info-text">If you have any questions about your order, please contact our customer support team.</p>
+        <div class="contact-methods">
+          <a href="mailto:support@example.com" class="contact-link">
+            <i class="fas fa-envelope"></i> support@example.com
+          </a>
+          <a href="tel:+1234567890" class="contact-link">
+            <i class="fas fa-phone"></i> +1 (234) 567-890
+          </a>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="order-actions">
+        <a href="{% url 'product_list' %}" class="order-action-btn btn-primary">
+          <i class="fas fa-shopping-bag"></i> Continue Shopping
+        </a>
+        <a href="{% url 'order_history' %}" class="order-action-btn btn-secondary">
+          <i class="fas fa-history"></i> View Order History
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Order Success Specific Styles */
+  .order-number {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-top: 0.5rem;
+  }
+  
+  .support-info {
+    text-align: center;
+    margin: 2.5rem 0;
+    padding: 1.5rem;
+    background: #f9fbfd;
+    border-radius: 12px;
+    border: 1px solid #edf2f7;
+  }
+  
+  .info-title {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: #0a1172;
+  }
+  
+  .info-text {
+    margin-bottom: 1.5rem;
+    color: #4a5568;
+  }
+  
+  .contact-methods {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #0a1172;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .contact-link:hover {
+    color: #1d4ed8;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .contact-methods {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .order-item {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .order-item-image {
+      margin-bottom: 0.5rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .order-success-title {
+      font-size: 1.5rem;
+    }
+    
+    .order-success-subtitle {
+      font-size: 1rem;
+    }
+    
+    .order-actions {
+      flex-direction: column;
+    }
+    
+    .order-action-btn {
+      width: 100%;
+    }
+  }
+</style>
+{% endblock %}

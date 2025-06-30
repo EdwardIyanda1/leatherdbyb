@@ -48,7 +48,8 @@ urlpatterns = [
     # Orders
     path('account/orders/', views.order_history, name='order_history'),
     path('account/orders/<int:pk>/', views.order_detail, name='order_detail'),
-
+    path('guest/order-summary/', views.guest_order_summary, name='guest_order_summary'),
+    
     # Password Reset
     path('accounts/password_reset/', auth_views.PasswordResetView.as_view(
         template_name='registration/password_reset_form.html',
