@@ -66,7 +66,6 @@ def guest_checkout(request):
             'email': email,
             'address': address
         })
-
     return render(request, 'guest_checkout.html')
 class CustomPasswordResetView(FormView):
     template_name = 'registration/password_reset_form.html'
