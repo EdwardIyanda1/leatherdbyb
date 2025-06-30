@@ -71,11 +71,11 @@
                            value="{{ user.userprofile.phone }}" placeholder="Enter your phone number">
                 </div>
                 
-                <div class="form-group">
+                {% comment %} <div class="form-group">
                     <label class="form-label">Date of Birth</label>
                     <input type="date" class="form-input" name="date_of_birth" 
                            value="{{ user.userprofile.date_of_birth|date:'Y-m-d' }}">
-                </div>
+                </div> {% endcomment %}
                 
                 <div class="form-group">
                     <label class="form-label">Gender</label>
