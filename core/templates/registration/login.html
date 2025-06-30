@@ -243,6 +243,17 @@
             <a href="{% url 'signup' %}">Create an account</a>
         </div>
 
+
+        <div class="divider">or</div>
+            <div class="social-login">
+                <button class="social-btn" onclick="signInAsGuest()">
+                    <i class="fas fa-user-secret"></i> Sign in as Guest
+                </button>
+                <p style="margin-top: 10px; font-size: 13px; color: #888; text-align: center;">
+                    <strong>Note:</strong> Guest sessions are stored on your browser. If you clear your browser data, LeatheredbyB will not be responsible for any lost data.
+                </p>
+            </div>
+
         {% comment %} <div class="divider">or continue with</div>
 
         <div class="social-login">
@@ -267,6 +278,18 @@
                 icon.classList.replace('fa-eye-slash', 'fa-eye');
             }
         }
+
+            function signInAsGuest() {
+        const guestId = `guest_${Date.now()}`;
+        const guestData = {
+            id: guestId,
+            createdAt: new Date().toISOString()
+        };
+        localStorage.setItem('leatheredbyb_guest', JSON.stringify(guestData));
+
+        // Optionally redirect to homepage or shop
+        window.location.href = '/';  // Change to your preferred route (e.g., /shop/)
+    }
     </script>
 </body>
 </html>
