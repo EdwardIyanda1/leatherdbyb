@@ -55,6 +55,8 @@ def create_admin_user(request):
     return HttpResponse("⚠️ Superuser already exists.")
 
 def guest_checkout(request):
+    cart = _get_cart(request)
+
     if request.method == "POST":
         full_name = request.POST.get('full_name')
         email = request.POST.get('email')
@@ -66,7 +68,25 @@ def guest_checkout(request):
             'email': email,
             'address': address
         })
-    return render(request, 'guest_checkout.html')
+
+    cart_items = cart.items.all()
+    cart_total = cart.subtotal  # or cart.get_subtotal() based on your model
+    delivery_fee = 2000
+    express_fee = 3500
+    tax = 0  # or a computed tax if needed
+    order_total = cart_total + delivery_fee + tax
+
+    context = {
+        'cart_items': cart_items,
+        'cart_total': cart_total,
+        'delivery_fee': delivery_fee,
+        'express_fee': express_fee,
+        'tax': tax,
+        'order_total': order_total
+    }
+
+    return render(request, 'guest_checkout.html', context)
+
 class CustomPasswordResetView(FormView):
     template_name = 'registration/password_reset_form.html'
     success_url = '/accounts/password_reset/done/'
