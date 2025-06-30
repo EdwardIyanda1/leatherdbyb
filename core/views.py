@@ -118,6 +118,9 @@ def newsletter_subscribe(request):
 
     return redirect('home')
 
+def terms_and_conditions(request):
+    return render(request, 'terms.html')
+
 @csrf_exempt
 def paystack_webhook(request):
     secret = settings.PAYSTACK_SECRET_KEY.encode()
