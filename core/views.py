@@ -54,6 +54,20 @@ def create_admin_user(request):
         return HttpResponse("✅ Superuser created.")
     return HttpResponse("⚠️ Superuser already exists.")
 
+def guest_checkout(request):
+    if request.method == "POST":
+        full_name = request.POST.get('full_name')
+        email = request.POST.get('email')
+        address = request.POST.get('address')
+
+        # You can later save this info or process payment
+        return render(request, 'order_success.html', {
+            'full_name': full_name,
+            'email': email,
+            'address': address
+        })
+
+    return render(request, 'guest_checkout.html')
 class CustomPasswordResetView(FormView):
     template_name = 'registration/password_reset_form.html'
     success_url = '/accounts/password_reset/done/'

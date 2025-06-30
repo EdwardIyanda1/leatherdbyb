@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="checkout-header mb-4">
+    <h2 class="mb-3">Guest Checkout</h2>
+    <p class="text-muted">Complete your purchase without creating an account</p>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <form method="post" class="checkout-form">
+        {% csrf_token %}
+        
+        <!-- Personal Information Section -->
+        <div class="checkout-section mb-4">
+          <h4 class="section-title mb-3">
+            <i class="fas fa-user-circle me-2"></i>Personal Information
+          </h4>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="full_name" class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="full_name" name="full_name" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="email" class="form-label">Email Address</label>
+              <input type="email" class="form-control" id="email" name="email" required>
+              <small class="text-muted">Order confirmation will be sent here</small>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="phone" class="form-label">Phone Number</label>
+            <input type="tel" class="form-control" id="phone" name="phone" required>
+            <small class="text-muted">For delivery updates</small>
+          </div>
+        </div>
+
+        <!-- Delivery Information Section -->
+        <div class="checkout-section mb-4">
+          <h4 class="section-title mb-3">
+            <i class="fas fa-truck me-2"></i>Delivery Information
+          </h4>
+          <div class="mb-3">
+            <label for="address" class="form-label">Full Address</label>
+            <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="city" class="form-label">City</label>
+              <input type="text" class="form-control" id="city" name="city" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="state" class="form-label">State</label>
+              <select class="form-select" id="state" name="state" required>
+                <option value="" selected disabled>Select State</option>
+                <!-- State options would be populated here -->
+              </select>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="delivery_notes" class="form-label">Delivery Notes (Optional)</label>
+            <textarea class="form-control" id="delivery_notes" name="delivery_notes" rows="2"></textarea>
+            <small class="text-muted">Special instructions for delivery</small>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-4">
+          <a href="{% url 'cart' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Cart
+          </a>
+          <button type="submit" class="btn btn-primary">
+            Proceed to Payment <i class="fas fa-arrow-right ms-2"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="order-summary p-4">
+        <h4 class="mb-3">Order Summary</h4>
+        
+        <!-- Cart items would be displayed here -->
+        <div class="cart-items mb-3">
+          {% for item in cart_items %}
+          <div class="cart-item d-flex justify-content-between py-2 border-bottom">
+            <div>
+              <h6 class="mb-1">{{ item.product.name }}</h6>
+              <small class="text-muted">Qty: {{ item.quantity }}</small>
+            </div>
+            <div>₦{{ item.total_price }}</div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="order-totals">
+          <div class="d-flex justify-content-between mb-2">
+            <span>Subtotal:</span>
+            <span>₦{{ cart_total }}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Delivery Fee:</span>
+            <span>₦{{ delivery_fee|default:"0" }}</span>
+          </div>
+          <div class="d-flex justify-content-between fw-bold mt-3 pt-2 border-top">
+            <span>Total:</span>
+            <span>₦{{ order_total }}</span>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="terms" required>
+            <label class="form-check-label" for="terms">
+              I agree to the <a href="{% url 'terms' %}">Terms & Conditions</a>
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="privacy" required>
+            <label class="form-check-label" for="privacy">
+              I agree to the <a href="{% url 'privacy' %}">Privacy Policy</a>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Custom styles matching your brand */
+  .checkout-header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+  }
+  
+  .checkout-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+  }
+  
+  .section-title {
+    color: #0a1172;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  
+  .order-summary {
+    background: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #eee;
+  }
+  
+  .btn-primary {
+    background-color: #0a1172;
+    border-color: #0a1172;
+  }
+  
+  .btn-primary:hover {
+    background-color: #1d4ed8;
+    border-color: #1d4ed8;
+  }
+  
+  .form-control:focus, .form-select:focus {
+    border-color: #0a1172;
+    box-shadow: 0 0 0 0.25rem rgba(10, 17, 114, 0.25);
+  }
+</style>
+{% endblock %}
