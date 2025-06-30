@@ -9,6 +9,7 @@ from core.views import create_admin_user
 urlpatterns = [
     path("healthz", health_check, name="health_check"),
     path('', views.home, name='home'),
+    path('guest-checkout/', views.guest_checkout, name='guest_checkout'),
     path("create-admin/", create_admin_user),
     path("run-migrations/", run_migrations),
     path('subscribe/', views.newsletter_subscribe, name='newsletter_subscribe'),

@@ -71,12 +71,7 @@
                 <span>Total</span>
                 <span>₦{{ cart.total|floatformat:2 }}</span>
             </div>
-            
-            {% if request.user.is_authenticated %}
-            <button class="checkout-btn" onclick="window.location.href='{% url 'checkout' %}'">Proceed to Checkout</button>
-            {% else %}
-            <button class="checkout-btn" onclick="window.location.href='{% url 'login' %}?next={% url 'checkout' %}'">Login to Checkout</button>
-            {% endif %}
+            <button class="checkout-btn" id="checkoutButton">Proceed to Checkout</button>
         </div>
         {% endif %}
     </div>
@@ -130,5 +125,27 @@ function removeFromCart(productId) {
         });
     }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    const checkoutBtn = document.getElementById("checkoutButton");
+    const guest = localStorage.getItem("leatheredbyb_guest");
+
+    if ("{{ request.user.is_authenticated }}" === "True") {
+        checkoutBtn.onclick = () => {
+            window.location.href = "{% url 'checkout' %}";
+        };
+    } else if (guest) {
+        // Redirect to guest checkout
+        checkoutBtn.onclick = () => {
+            window.location.href = "{% url 'guest_checkout' %}";  // You must create this URL/view/template
+        };
+    } else {
+        // Redirect to login
+        checkoutBtn.onclick = () => {
+            window.location.href = "{% url 'login' %}?next={% url 'checkout' %}";
+        };
+    }
+});
 </script>
+
 {% endblock %}
