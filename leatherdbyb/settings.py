@@ -3,6 +3,14 @@ from pathlib import Path
 from decouple import config
 import dj_database_url
 
+import os
+
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS = [RENDER_EXTERNAL_HOSTNAME, '127.0.0.1', 'localhost']
+else:
+    ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 ROOT_URLCONF = 'leatherdbyb.urls'
