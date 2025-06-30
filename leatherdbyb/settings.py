@@ -4,7 +4,7 @@ from decouple import config
 import dj_database_url
 from decouple import config
 import os
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1 localhost .onrender.com').split()
+ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1']
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 
 if RENDER_EXTERNAL_HOSTNAME:
