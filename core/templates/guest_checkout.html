@@ -129,7 +129,11 @@
         {% for item in cart_items %}
         <div class="order-item">
           <div class="order-item-image">
-            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+            {% if item.product.images.first %}
+              <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}">
+            {% else %}
+              <img src="/static/img/default.jpg" alt="No image">
+            {% endif %}
             <span class="item-quantity">{{ item.quantity }}</span>
           </div>
           <div class="order-item-info">

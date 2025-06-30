@@ -55,7 +55,7 @@ def create_admin_user(request):
     return HttpResponse("⚠️ Superuser already exists.")
 
 def guest_checkout(request):
-    cart = _get_cart(request)
+    cart = _get_cart(request)  # Handles session vs. authenticated users
 
     if request.method == "POST":
         full_name = request.POST.get('full_name')
@@ -69,22 +69,13 @@ def guest_checkout(request):
             'address': address
         })
 
-    cart_items = cart.items.all()
-    cart_total = cart.subtotal  # or cart.get_subtotal() based on your model
-    delivery_fee = 2000
-    express_fee = 3500
-    tax = 0  # or a computed tax if needed
-    order_total = cart_total + delivery_fee + tax
-
     context = {
-        'cart_items': cart_items,
-        'cart_total': cart_total,
-        'delivery_fee': delivery_fee,
-        'express_fee': express_fee,
-        'tax': tax,
-        'order_total': order_total
+        'cart_items': cart.items.all(),
+        'cart_total': cart.subtotal,
+        'delivery_fee': Decimal('2000.00'),
+        'tax': Decimal('1500.00'),
+        'order_total': cart.total
     }
-
     return render(request, 'guest_checkout.html', context)
 
 class CustomPasswordResetView(FormView):
