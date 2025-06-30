@@ -2,122 +2,183 @@
 
 {% block content %}
 <div class="main-content">
-  <div class="checkout-header mb-30">
-    <h2 class="section-title">Guest Checkout</h2>
-    <p class="text-muted">Complete your purchase without creating an account</p>
+  <div class="checkout-header mb-30 text-center">
+    <h1 class="section-title" style="font-size: 2rem;">Guest Checkout</h1>
+    <p class="text-muted">Complete your purchase quickly without creating an account</p>
   </div>
 
   <div class="cart-container">
+    <!-- Checkout Form Column -->
     <div class="cart-items">
+      <div class="checkout-progress mb-20">
+        <div class="progress-steps">
+          <div class="step active">
+            <span class="step-number">1</span>
+            <span class="step-text">Information</span>
+          </div>
+          <div class="step">
+            <span class="step-number">2</span>
+            <span class="step-text">Payment</span>
+          </div>
+          <div class="step">
+            <span class="step-number">3</span>
+            <span class="step-text">Confirmation</span>
+          </div>
+        </div>
+      </div>
+
       <form method="post" class="checkout-form">
         {% csrf_token %}
         
-        <!-- Personal Information Section -->
+        <!-- Contact Information -->
         <div class="checkout-section mb-20">
-          <h4 class="section-title mb-10">
-            <i class="fas fa-user-circle me-2"></i>Personal Information
-          </h4>
+          <h3 class="section-title mb-15">
+            <i class="fas fa-user-circle mr-10"></i>Contact Information
+          </h3>
           <div class="form-group">
-            <label for="full_name" class="form-label">Full Name</label>
-            <input type="text" class="form-input" id="full_name" name="full_name" required>
+            <input type="email" class="form-input" placeholder="Email address" name="email" required>
+            <small class="form-hint">Order confirmation will be sent here</small>
           </div>
-          <div class="form-group">
-            <label for="email" class="form-label">Email Address</label>
-            <input type="email" class="form-input" id="email" name="email" required>
-            <small class="text-muted">Order confirmation will be sent here</small>
-          </div>
-          <div class="form-group">
-            <label for="phone" class="form-label">Phone Number</label>
-            <input type="tel" class="form-input" id="phone" name="phone" required>
-            <small class="text-muted">For delivery updates</small>
+          <div class="form-checkbox">
+            <input type="checkbox" id="email-offers">
+            <label for="email-offers">Email me with news and offers</label>
           </div>
         </div>
 
-        <!-- Delivery Information Section -->
-        <div class="checkout-section">
-          <h4 class="section-title mb-10">
-            <i class="fas fa-truck me-2"></i>Delivery Information
-          </h4>
+        <!-- Shipping Address -->
+        <div class="checkout-section mb-20">
+          <h3 class="section-title mb-15">
+            <i class="fas fa-truck mr-10"></i>Shipping Address
+          </h3>
           <div class="form-group">
-            <label for="address" class="form-label">Full Address</label>
-            <textarea class="form-input" id="address" name="address" rows="3" required></textarea>
+            <input type="text" class="form-input" placeholder="Full name" name="full_name" required>
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div class="form-group">
+            <input type="tel" class="form-input" placeholder="Phone number" name="phone" required>
+            <small class="form-hint">For delivery updates</small>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-input" placeholder="Address" name="address" required>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-input" placeholder="Apartment, suite, etc. (optional)" name="address2">
+          </div>
+          
+          <div class="grid-col-2 gap-15">
             <div class="form-group">
-              <label for="city" class="form-label">City</label>
-              <input type="text" class="form-input" id="city" name="city" required>
+              <input type="text" class="form-input" placeholder="City" name="city" required>
             </div>
             <div class="form-group">
-              <label for="state" class="form-label">State</label>
-              <select class="form-input" id="state" name="state" required>
-                <option value="" selected disabled>Select State</option>
-                <!-- State options would be populated here -->
+              <select class="form-input" name="state" required>
+                <option value="" disabled selected>State</option>
+                <!-- State options would go here -->
               </select>
             </div>
           </div>
+          
           <div class="form-group">
-            <label for="delivery_notes" class="form-label">Delivery Notes (Optional)</label>
-            <textarea class="form-input" id="delivery_notes" name="delivery_notes" rows="2"></textarea>
-            <small class="text-muted">Special instructions for delivery</small>
+            <input type="text" class="form-input" placeholder="ZIP code" name="zip" required>
           </div>
         </div>
 
-        <div class="product-actions" style="margin-top: 30px; justify-content: space-between;">
-          <a href="{% url 'cart_detail' %}" class="action-btn view-btn">
-            <i class="fas fa-arrow-left me-2"></i>Back to Cart
+        <!-- Delivery Options -->
+        <div class="checkout-section mb-20">
+          <h3 class="section-title mb-15">
+            <i class="fas fa-shipping-fast mr-10"></i>Delivery Method
+          </h3>
+          <div class="delivery-options">
+            <label class="delivery-option active">
+              <input type="radio" name="delivery" checked>
+              <div class="option-content">
+                <div class="option-header">
+                  <span class="option-title">Standard Delivery</span>
+                  <span class="option-price">₦{{ delivery_fee|default:"0" }}</span>
+                </div>
+                <p class="option-desc">3-5 business days</p>
+              </div>
+            </label>
+            <label class="delivery-option">
+              <input type="radio" name="delivery">
+              <div class="option-content">
+                <div class="option-header">
+                  <span class="option-title">Express Delivery</span>
+                  <span class="option-price">₦{{ express_fee|default:"1500" }}</span>
+                </div>
+                <p class="option-desc">1-2 business days</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="checkout-actions">
+          <a href="{% url 'cart_detail' %}" class="btn-back">
+            <i class="fas fa-arrow-left mr-10"></i>Return to cart
           </a>
-          <button type="submit" class="add-to-cart-main">
-            Proceed to Payment <i class="fas fa-arrow-right ms-2"></i>
+          <button type="submit" class="btn-continue">
+            Continue to payment <i class="fas fa-arrow-right ml-10"></i>
           </button>
         </div>
       </form>
     </div>
 
+    <!-- Order Summary Column -->
     <div class="cart-summary">
-      <h4 class="summary-title">Order Summary</h4>
+      <h3 class="summary-title">Order Summary</h3>
       
-      <!-- Cart items would be displayed here -->
-      <div class="mb-20">
+      <div class="order-items">
         {% for item in cart_items %}
         <div class="order-item">
-          <div class="order-item-name">
-            <span>{{ item.product.name }}</span>
+          <div class="order-item-image">
+            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+            <span class="item-quantity">{{ item.quantity }}</span>
           </div>
-          <div class="order-item-price">
-            <span>Qty: {{ item.quantity }} × ₦{{ item.product.price }}</span>
-            <div style="text-align: right;">₦{{ item.total_price }}</div>
+          <div class="order-item-info">
+            <h4 class="item-name">{{ item.product.name }}</h4>
+            <p class="item-price">₦{{ item.total_price }}</p>
           </div>
         </div>
         {% endfor %}
       </div>
 
-      <div class="summary-rows">
+      <div class="summary-section">
         <div class="summary-row">
-          <span class="summary-label">Subtotal:</span>
-          <span class="summary-value">₦{{ cart_total }}</span>
+          <span>Subtotal</span>
+          <span>₦{{ cart_total }}</span>
         </div>
         <div class="summary-row">
-          <span class="summary-label">Delivery Fee:</span>
-          <span class="summary-value">₦{{ delivery_fee|default:"0" }}</span>
+          <span>Shipping</span>
+          <span>₦{{ delivery_fee|default:"0" }}</span>
         </div>
-        <div class="summary-row summary-total">
-          <span>Total:</span>
+        <div class="summary-row">
+          <span>Tax</span>
+          <span>₦{{ tax|default:"0" }}</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
           <span>₦{{ order_total }}</span>
         </div>
       </div>
 
-      <div class="mt-20">
-        <div class="form-checkbox mb-10">
-          <input type="checkbox" id="terms" required>
-          <label for="terms">
-            I agree to the <a href="{% url 'terms' %}" style="color: #0a1172;">Terms & Conditions</a>
-          </label>
+      <div class="payment-methods">
+        <div class="payment-icon">
+          <i class="fab fa-cc-visa"></i>
         </div>
-        <div class="form-checkbox">
-          <input type="checkbox" id="privacy" required>
-          <label for="privacy">
-            I agree to the <a href="{% url 'privacy_policy' %}" style="color: #0a1172;">Privacy Policy</a>
-          </label>
+        <div class="payment-icon">
+          <i class="fab fa-cc-mastercard"></i>
+        </div>
+        <div class="payment-icon">
+          <i class="fab fa-cc-paypal"></i>
+        </div>
+      </div>
+
+      <div class="security-info">
+        <div class="security-item">
+          <i class="fas fa-lock"></i>
+          <span>Secure checkout</span>
+        </div>
+        <div class="security-item">
+          <i class="fas fa-shield-alt"></i>
+          <span>Guaranteed safe</span>
         </div>
       </div>
     </div>
@@ -125,50 +186,325 @@
 </div>
 
 <style>
+  /* Custom Checkout Styles */
   .checkout-header {
-    border-bottom: 1px solid #eee;
-    padding-bottom: 15px;
+    max-width: 800px;
+    margin: 0 auto 40px;
+  }
+  
+  .checkout-progress {
+    padding: 15px 0;
+  }
+  
+  .progress-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+  }
+  
+  .progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #eee;
+    z-index: 1;
+  }
+  
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .step-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #eee;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  
+  .step.active .step-number {
+    background: #0a1172;
+    color: white;
+  }
+  
+  .step-text {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .step.active .step-text {
+    color: #0a1172;
+    font-weight: 500;
   }
   
   .checkout-section {
     background: white;
-    padding: 25px;
     border-radius: 12px;
+    padding: 25px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     margin-bottom: 20px;
   }
   
-  .form-input {
+  .section-title {
+    color: #0a1172;
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+  
+  .form-hint {
+    display: block;
+    font-size: 13px;
+    color: #666;
+    margin-top: 5px;
+  }
+  
+  .grid-col-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+  
+  .delivery-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .delivery-option {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .delivery-option.active {
+    border-color: #0a1172;
+    background: #eff6ff;
+  }
+  
+  .delivery-option input {
+    display: none;
+  }
+  
+  .option-header {
+    display: flex;
+    justify-content: space-between;
     margin-bottom: 5px;
   }
   
-  .form-checkbox input {
-    width: auto;
-    height: auto;
+  .option-title {
+    font-weight: 500;
   }
   
-  .action-btn.view-btn {
-    padding: 12px 20px;
+  .option-price {
+    font-weight: 600;
+    color: #0a1172;
+  }
+  
+  .option-desc {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .checkout-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+  }
+  
+  .btn-back {
+    color: #666;
     text-decoration: none;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
   }
   
-  @media (max-width: 768px) {
+  .btn-back:hover {
+    color: #0a1172;
+  }
+  
+  .btn-continue {
+    background: #0a1172;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s;
+  }
+  
+  .btn-continue:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+  }
+  
+  /* Order Summary Styles */
+  .order-items {
+    margin-bottom: 20px;
+  }
+  
+  .order-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .order-item:last-child {
+    border-bottom: none;
+  }
+  
+  .order-item-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  
+  .order-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .item-quantity {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #0a1172;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+  
+  .item-name {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 5px;
+  }
+  
+  .item-price {
+    color: #0a1172;
+    font-weight: 600;
+    font-size: 15px;
+  }
+  
+  .summary-section {
+    padding: 15px 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    margin: 20px 0;
+  }
+  
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 15px;
+  }
+  
+  .summary-row:last-child {
+    margin-bottom: 0;
+  }
+  
+  .summary-row.total {
+    font-weight: 600;
+    font-size: 16px;
+    color: #0a1172;
+  }
+  
+  .payment-methods {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+  }
+  
+  .payment-icon {
+    font-size: 24px;
+    color: #666;
+  }
+  
+  .security-info {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .security-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 992px) {
     .cart-container {
       flex-direction: column;
+    }
+    
+    .checkout-header {
+      margin-bottom: 20px;
+    }
+    
+    .checkout-actions {
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .btn-continue, .btn-back {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .grid-col-2 {
+      grid-template-columns: 1fr;
     }
     
     .checkout-section {
       padding: 20px;
     }
     
-    .product-actions {
-      flex-direction: column;
-      gap: 10px;
+    .section-title {
+      font-size: 16px;
     }
     
-    .add-to-cart-main, .action-btn.view-btn {
-      width: 100%;
-      text-align: center;
+    .progress-steps {
+      gap: 5px;
+    }
+    
+    .step-text {
+      font-size: 12px;
     }
   }
 </style>
