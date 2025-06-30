@@ -1,125 +1,123 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container py-5">
-  <div class="checkout-header mb-4">
-    <h2 class="mb-3">Guest Checkout</h2>
+<div class="main-content">
+  <div class="checkout-header mb-30">
+    <h2 class="section-title">Guest Checkout</h2>
     <p class="text-muted">Complete your purchase without creating an account</p>
   </div>
 
-  <div class="row">
-    <div class="col-lg-8">
+  <div class="cart-container">
+    <div class="cart-items">
       <form method="post" class="checkout-form">
         {% csrf_token %}
         
         <!-- Personal Information Section -->
-        <div class="checkout-section mb-4">
-          <h4 class="section-title mb-3">
+        <div class="checkout-section mb-20">
+          <h4 class="section-title mb-10">
             <i class="fas fa-user-circle me-2"></i>Personal Information
           </h4>
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="full_name" class="form-label">Full Name</label>
-              <input type="text" class="form-control" id="full_name" name="full_name" required>
-            </div>
-            <div class="col-md-6 mb-3">
-              <label for="email" class="form-label">Email Address</label>
-              <input type="email" class="form-control" id="email" name="email" required>
-              <small class="text-muted">Order confirmation will be sent here</small>
-            </div>
+          <div class="form-group">
+            <label for="full_name" class="form-label">Full Name</label>
+            <input type="text" class="form-input" id="full_name" name="full_name" required>
           </div>
-          <div class="mb-3">
+          <div class="form-group">
+            <label for="email" class="form-label">Email Address</label>
+            <input type="email" class="form-input" id="email" name="email" required>
+            <small class="text-muted">Order confirmation will be sent here</small>
+          </div>
+          <div class="form-group">
             <label for="phone" class="form-label">Phone Number</label>
-            <input type="tel" class="form-control" id="phone" name="phone" required>
+            <input type="tel" class="form-input" id="phone" name="phone" required>
             <small class="text-muted">For delivery updates</small>
           </div>
         </div>
 
         <!-- Delivery Information Section -->
-        <div class="checkout-section mb-4">
-          <h4 class="section-title mb-3">
+        <div class="checkout-section">
+          <h4 class="section-title mb-10">
             <i class="fas fa-truck me-2"></i>Delivery Information
           </h4>
-          <div class="mb-3">
+          <div class="form-group">
             <label for="address" class="form-label">Full Address</label>
-            <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+            <textarea class="form-input" id="address" name="address" rows="3" required></textarea>
           </div>
-          <div class="row">
-            <div class="col-md-6 mb-3">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-group">
               <label for="city" class="form-label">City</label>
-              <input type="text" class="form-control" id="city" name="city" required>
+              <input type="text" class="form-input" id="city" name="city" required>
             </div>
-            <div class="col-md-6 mb-3">
+            <div class="form-group">
               <label for="state" class="form-label">State</label>
-              <select class="form-select" id="state" name="state" required>
+              <select class="form-input" id="state" name="state" required>
                 <option value="" selected disabled>Select State</option>
                 <!-- State options would be populated here -->
               </select>
             </div>
           </div>
-          <div class="mb-3">
+          <div class="form-group">
             <label for="delivery_notes" class="form-label">Delivery Notes (Optional)</label>
-            <textarea class="form-control" id="delivery_notes" name="delivery_notes" rows="2"></textarea>
+            <textarea class="form-input" id="delivery_notes" name="delivery_notes" rows="2"></textarea>
             <small class="text-muted">Special instructions for delivery</small>
           </div>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mt-4">
-          <a href="{% url 'cart_detail' %}" class="btn btn-outline-secondary">
+        <div class="product-actions" style="margin-top: 30px; justify-content: space-between;">
+          <a href="{% url 'cart_detail' %}" class="action-btn view-btn">
             <i class="fas fa-arrow-left me-2"></i>Back to Cart
           </a>
-          <button type="submit" class="btn btn-primary">
+          <button type="submit" class="add-to-cart-main">
             Proceed to Payment <i class="fas fa-arrow-right ms-2"></i>
           </button>
         </div>
       </form>
     </div>
 
-    <div class="col-lg-4">
-      <div class="order-summary p-4">
-        <h4 class="mb-3">Order Summary</h4>
-        
-        <!-- Cart items would be displayed here -->
-        <div class="cart-items mb-3">
-          {% for item in cart_items %}
-          <div class="cart-item d-flex justify-content-between py-2 border-bottom">
-            <div>
-              <h6 class="mb-1">{{ item.product.name }}</h6>
-              <small class="text-muted">Qty: {{ item.quantity }}</small>
-            </div>
-            <div>₦{{ item.total_price }}</div>
+    <div class="cart-summary">
+      <h4 class="summary-title">Order Summary</h4>
+      
+      <!-- Cart items would be displayed here -->
+      <div class="mb-20">
+        {% for item in cart_items %}
+        <div class="order-item">
+          <div class="order-item-name">
+            <span>{{ item.product.name }}</span>
           </div>
-          {% endfor %}
-        </div>
-
-        <div class="order-totals">
-          <div class="d-flex justify-content-between mb-2">
-            <span>Subtotal:</span>
-            <span>₦{{ cart_total }}</span>
-          </div>
-          <div class="d-flex justify-content-between mb-2">
-            <span>Delivery Fee:</span>
-            <span>₦{{ delivery_fee|default:"0" }}</span>
-          </div>
-          <div class="d-flex justify-content-between fw-bold mt-3 pt-2 border-top">
-            <span>Total:</span>
-            <span>₦{{ order_total }}</span>
+          <div class="order-item-price">
+            <span>Qty: {{ item.quantity }} × ₦{{ item.product.price }}</span>
+            <div style="text-align: right;">₦{{ item.total_price }}</div>
           </div>
         </div>
+        {% endfor %}
+      </div>
 
-        <div class="mt-4">
-          <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" id="terms" required>
-            <label class="form-check-label" for="terms">
-              I agree to the <a href="{% url 'terms' %}">Terms & Conditions</a>
-            </label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="privacy" required>
-            <label class="form-check-label" for="privacy">
-              I agree to the <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
-            </label>
-          </div>
+      <div class="summary-rows">
+        <div class="summary-row">
+          <span class="summary-label">Subtotal:</span>
+          <span class="summary-value">₦{{ cart_total }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Delivery Fee:</span>
+          <span class="summary-value">₦{{ delivery_fee|default:"0" }}</span>
+        </div>
+        <div class="summary-row summary-total">
+          <span>Total:</span>
+          <span>₦{{ order_total }}</span>
+        </div>
+      </div>
+
+      <div class="mt-20">
+        <div class="form-checkbox mb-10">
+          <input type="checkbox" id="terms" required>
+          <label for="terms">
+            I agree to the <a href="{% url 'terms' %}" style="color: #0a1172;">Terms & Conditions</a>
+          </label>
+        </div>
+        <div class="form-checkbox">
+          <input type="checkbox" id="privacy" required>
+          <label for="privacy">
+            I agree to the <a href="{% url 'privacy_policy' %}" style="color: #0a1172;">Privacy Policy</a>
+          </label>
         </div>
       </div>
     </div>
@@ -127,45 +125,51 @@
 </div>
 
 <style>
-  /* Custom styles matching your brand */
   .checkout-header {
     border-bottom: 1px solid #eee;
-    padding-bottom: 1rem;
+    padding-bottom: 15px;
   }
   
   .checkout-section {
     background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    border: 1px solid #eee;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
   }
   
-  .section-title {
-    color: #0a1172;
-    font-size: 1.1rem;
-    font-weight: 600;
+  .form-input {
+    margin-bottom: 5px;
   }
   
-  .order-summary {
-    background: #f9f9f9;
-    border-radius: 8px;
-    border: 1px solid #eee;
+  .form-checkbox input {
+    width: auto;
+    height: auto;
   }
   
-  .btn-primary {
-    background-color: #0a1172;
-    border-color: #0a1172;
+  .action-btn.view-btn {
+    padding: 12px 20px;
+    text-decoration: none;
   }
   
-  .btn-primary:hover {
-    background-color: #1d4ed8;
-    border-color: #1d4ed8;
-  }
-  
-  .form-control:focus, .form-select:focus {
-    border-color: #0a1172;
-    box-shadow: 0 0 0 0.25rem rgba(10, 17, 114, 0.25);
+  @media (max-width: 768px) {
+    .cart-container {
+      flex-direction: column;
+    }
+    
+    .checkout-section {
+      padding: 20px;
+    }
+    
+    .product-actions {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .add-to-cart-main, .action-btn.view-btn {
+      width: 100%;
+      text-align: center;
+    }
   }
 </style>
 {% endblock %}
