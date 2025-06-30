@@ -62,14 +62,13 @@ def guest_checkout(request):
         email = request.POST.get('email')
         address = request.POST.get('address')
 
-        # You can later save this info or process payment
         return render(request, 'order_success.html', {
             'full_name': full_name,
             'email': email,
             'address': address,
             'tax': Decimal('1500.00'),
             'order_total': cart.total,
-            'state_choices': Address.STATE_CHOICES,
+            'state_choices': Address.STATE_CHOICES,  # ✅ keep this for POST too
         })
 
     context = {
@@ -77,9 +76,11 @@ def guest_checkout(request):
         'cart_total': cart.subtotal,
         'delivery_fee': Decimal('2000.00'),
         'tax': Decimal('1500.00'),
-        'order_total': cart.total
+        'order_total': cart.total,
+        'state_choices': Address.STATE_CHOICES,  # ✅ THIS was missing
     }
     return render(request, 'guest_checkout.html', context)
+
 
 class CustomPasswordResetView(FormView):
     template_name = 'registration/password_reset_form.html'
