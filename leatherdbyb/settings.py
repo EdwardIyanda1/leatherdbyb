@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Secret key & debug
 SECRET_KEY = config("SECRET_KEY")
-DEBUG = False
+DEBUG = True
 
 # Allowed hosts
 RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
