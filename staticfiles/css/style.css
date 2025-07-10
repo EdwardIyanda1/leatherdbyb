@@ -6,6 +6,7 @@
         text-transform: capitalize;
     }
 
+
     /* Active category filter */
     .categories .category-card.active {
         background: #eff6ff;
@@ -24,7 +25,6 @@
             overflow-x: hidden;
         }
 
-        /* Desktop Navigation */
         .desktop-nav {
             display: flex;
             justify-content: space-between;
