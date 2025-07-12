@@ -101,19 +101,19 @@ LOGIN_URL = '/account/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Messages
+
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
-# Session settings
-SESSION_COOKIE_AGE = 86400  # 1 day
+
+SESSION_COOKIE_AGE = 86400  
 SESSION_SAVE_EVERY_REQUEST = True
 
-# Security
-SECURE_SSL_REDIRECT = False  # Set to True in production
-SESSION_COOKIE_SECURE = False  # Set to True in production
-CSRF_COOKIE_SECURE = False  # Set to True in production
+
+SECURE_SSL_REDIRECT = False 
+SESSION_COOKIE_SECURE = False  
+CSRF_COOKIE_SECURE = False  
 
 # Paystack
 PAYSTACK_SECRET_KEY = 'pk_test_d82a6709cfd5fec170010103dd47c5b493cbc01a'
