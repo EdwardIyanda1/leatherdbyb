@@ -9,14 +9,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Secret key & debug
 SECRET_KEY = config("SECRET_KEY")
-DEBUG = True
+DEBUG = False
 
-# Allowed hosts
-RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS = [RENDER_EXTERNAL_HOSTNAME, "127.0.0.1", "localhost"]
+if DEBUG:
+    ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 else:
-    ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1,localhost,.onrender.com").split(",")
+    RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+    if RENDER_EXTERNAL_HOSTNAME:
+        ALLOWED_HOSTS = [RENDER_EXTERNAL_HOSTNAME, ".onrender.com"]
+    else:
+        ALLOWED_HOSTS = config("ALLOWED_HOSTS", default=".onrender.com").split(",")
 
 # Application definition
 INSTALLED_APPS = [
@@ -62,10 +64,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'leatherdbyb.wsgi.application'
 
-# Database
-DATABASES = {
-    "default": dj_database_url.config(default=config("DATABASE_URL"))
-}
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+else:
+    DATABASES = {
+        'default': dj_database_url.config(default=config("DATABASE_URL"))
+    }
+
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
@@ -101,9 +111,9 @@ SESSION_COOKIE_AGE = 86400  # 1 day
 SESSION_SAVE_EVERY_REQUEST = True
 
 # Security
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = False  # Set to True in production
+SESSION_COOKIE_SECURE = False  # Set to True in production
+CSRF_COOKIE_SECURE = False  # Set to True in production
 
 # Paystack
 PAYSTACK_SECRET_KEY = 'pk_test_d82a6709cfd5fec170010103dd47c5b493cbc01a'
