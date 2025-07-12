@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Secret key & debug
 SECRET_KEY = config("SECRET_KEY")
-DEBUG = False
+DEBUG = True
 
 if DEBUG:
     ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
