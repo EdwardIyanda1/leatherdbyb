@@ -12,7 +12,7 @@ SECRET_KEY = config("SECRET_KEY")
 DEBUG = True
 
 if DEBUG:
-    ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+    ALLOWED_HOSTS = ["127.0.0.1", "localhost", 'leatheredbyb.onrender.com',]
 else:
     RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
     if RENDER_EXTERNAL_HOSTNAME:
